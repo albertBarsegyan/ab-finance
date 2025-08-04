@@ -1,11 +1,12 @@
 import { Button } from '@/shared/components/ui/button';
-import { Badge, Download, Play, Star } from 'lucide-react';
+import { Badge, Play, Star } from 'lucide-react';
 import { LazyImage } from '@/shared/components/lazy-image';
+import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 
 export function HeroSection() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-br from-green-50 to-emerald-50">
-      <div className="container px-4 md:px-6">
+      <SectionLayout>
         <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
           <div className="flex flex-col justify-center space-y-4">
             <div className="space-y-2">
@@ -23,8 +24,8 @@ export function HeroSection() {
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
               <Button size="lg" className="bg-green-600 hover:bg-green-700">
-                <Download className="mr-2 h-4 w-4" />
-                Download Free App
+                <Star className="mr-2 h-4 w-4" />
+                Get started
               </Button>
               <Button variant="outline" size="lg">
                 <Play className="mr-2 h-4 w-4" />
@@ -45,14 +46,14 @@ export function HeroSection() {
           <div className="flex items-center justify-center">
             <LazyImage
               src="/placeholder.svg?height=600&width=400"
-              width="400"
-              height="600"
-              alt="FinanceFlow App Screenshot"
-              className="lg:mx-auto w-fit aspect-[2/3] overflow-hidden rounded-xl object-cover shadow-2xl"
+              width="600"
+              height="400"
+              alt="abFinance App Screenshot"
+              className="w-full max-w-[600px] overflow-hidden rounded-xl object-cover shadow-2xl"
             />
           </div>
         </div>
-      </div>
+      </SectionLayout>
     </section>
   );
 }

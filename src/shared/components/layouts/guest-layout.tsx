@@ -1,11 +1,11 @@
 import { Outlet } from 'react-router-dom';
 import { FooterSection } from '@/shared/components/pages/home/footer-section.tsx';
-import { NavigationSection } from '@/shared/components/navigation';
+import { NavbarController } from '@/shared/components/navigation/controller.tsx';
 
 export function GuestLayout() {
   return (
     <div className="min-h-screen relative flex flex-col">
-      <NavigationSection />
+      <NavbarController />
       <main>
         <Outlet />
       </main>

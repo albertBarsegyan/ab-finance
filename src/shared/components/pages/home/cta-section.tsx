@@ -5,15 +5,15 @@ import { ArrowRight, CheckCircle } from 'lucide-react';
 export function CTASection() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 bg-green-600">
-      <div className="container px-4 md:px-6">
+      <div className="flex px-4 md:px-6 w-full items-center justify-center">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white">
-              Ready to transform your finances?
+              Ready to economy your finances?
             </h2>
             <p className="mx-auto max-w-[600px] text-green-100 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
               Join over 1 million users who have taken control of their
-              financial future with FinanceFlow.
+              financial future with abFinance.
             </p>
           </div>
 
@@ -36,7 +36,7 @@ export function CTASection() {
           <div className="flex items-center gap-4 pt-4">
             <div className="flex items-center gap-2 text-green-100">
               <CheckCircle className="h-4 w-4" />
-              <span className="text-sm">Free forever plan</span>
+              <span className="text-sm">Freemium plan</span>
             </div>
             <div className="flex items-center gap-2 text-green-100">
               <CheckCircle className="h-4 w-4" />

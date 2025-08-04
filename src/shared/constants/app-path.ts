@@ -9,3 +9,10 @@ export const appPath = {
   BUDGET: '/budget',
   GOALS: '/goals',
 };
+
+export const homeSectionName = {
+  FEATURES: '/#features',
+  STATS: '/#stats',
+  ABOUT: '/#about',
+  TESTIMONIALS: '/#testimonials',
+};

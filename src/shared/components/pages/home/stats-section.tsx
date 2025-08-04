@@ -1,10 +1,11 @@
 import { Badge } from 'lucide-react';
 import { LazyImage } from '@/shared/components/lazy-image';
+import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 
 export function StatsSection() {
   return (
     <section id="stats" className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
-      <div className="flex items-center justify-center px-4 md:px-6">
+      <SectionLayout>
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
           <div className="flex flex-col justify-center space-y-4">
             <div className="space-y-2">
@@ -12,7 +13,7 @@ export function StatsSection() {
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                 Join the financial wellness revolution
               </h2>
-              <p className="max-w-[600px] text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              <p className="text-wrap max-w-[600px] text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 Our users have saved over $2 billion and achieved their
                 financial goals faster than ever before.
               </p>
@@ -46,11 +47,11 @@ export function StatsSection() {
               width="600"
               height="400"
               alt="Financial Dashboard"
-              className="mx-auto aspect-video overflow-hidden rounded-xl object-cover shadow-lg"
+              className="w-fit aspect-video overflow-hidden rounded-xl object-cover shadow-lg"
             />
           </div>
         </div>
-      </div>
+      </SectionLayout>
     </section>
   );
 }

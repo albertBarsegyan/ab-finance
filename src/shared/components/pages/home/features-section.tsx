@@ -12,13 +12,14 @@ import {
   Target,
   TrendingUp,
 } from 'lucide-react';
+import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 
 export function FeaturesSection() {
   return (
     <section id="features" className="w-full py-12 md:py-24 lg:py-32">
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2">
+      <SectionLayout className="items-center justify-center">
+        <div className="flex flex-col items-center justify-between text-center">
+          <div className="space-y-2 max-w-[760px]">
             <Badge>Features</Badge>
             <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
               Everything you need to manage your money
@@ -29,7 +30,7 @@ export function FeaturesSection() {
             </p>
           </div>
         </div>
-        <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-8">
+        <div className="w-full grid items-center gap-6 py-12 lg:grid-cols-3 lg:gap-8">
           <Card>
             <CardHeader>
               <PieChart className="h-10 w-10 text-green-600" />
@@ -91,7 +92,7 @@ export function FeaturesSection() {
             </CardHeader>
           </Card>
         </div>
-      </div>
+      </SectionLayout>
     </section>
   );
 }

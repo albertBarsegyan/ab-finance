@@ -36,7 +36,7 @@ export function AuthenticatedLayout() {
         />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
           <div className="flex h-16 items-center justify-between px-4">
-            <h1 className="text-xl font-bold text-gray-900">FinanceFlow</h1>
+            <h1 className="text-xl font-bold text-gray-900">abFinance</h1>
             <Button
               variant="ghost"
               size="sm"
@@ -74,11 +74,10 @@ export function AuthenticatedLayout() {
         </div>
       </div>
 
-      {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
           <div className="flex items-center h-16 px-4">
-            <h1 className="text-xl font-bold text-gray-900">FinanceFlow</h1>
+            <h1 className="text-xl font-bold text-gray-900">abFinance</h1>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map(item => {

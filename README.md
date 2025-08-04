@@ -1,69 +1,95 @@
-# React + TypeScript + Vite
+# Finance Management App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern finance management application built with React, TypeScript, and Tailwind CSS.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- User authentication (login/register)
+- Dashboard with financial overview
+- Transaction management
+- Budget tracking
+- Financial goals
+- Profile management
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js (v18 or higher)
+- pnpm (recommended) or npm
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd finance-management
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. Install dependencies:
+```bash
+pnpm install
 ```
+
+3. Install additional dependencies for form validation:
+```bash
+pnpm add react-hook-form @hookform/resolvers zod
+```
+
+4. Start the development server:
+```bash
+pnpm dev
+```
+
+The application will be available at `http://localhost:5173`.
+
+## Form Validation
+
+The application uses React Hook Form with Zod schema validation for all forms:
+
+- **Login Form**: Email and password validation
+- **Register Form**: Complete user registration with comprehensive validation
+
+### Validation Features
+
+- Real-time validation feedback
+- Password strength requirements
+- Email format validation
+- Phone number format validation
+- Terms and conditions acceptance
+- Password confirmation matching
+
+## Tech Stack
+
+- **Frontend**: React 19, TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Radix UI + shadcn/ui
+- **Forms**: React Hook Form + Zod
+- **Routing**: React Router DOM
+- **Authentication**: Firebase
+- **Build Tool**: Vite
+
+## Project Structure
+
+```
+src/
+├── app/                 # App configuration and providers
+├── entities/           # Business entities
+├── features/           # Feature modules
+├── pages/             # Page components
+│   └── auth/          # Authentication pages
+├── shared/            # Shared components and utilities
+│   ├── components/    # UI components
+│   ├── lib/          # Utilities and schemas
+│   └── utils/        # Helper functions
+└── widgets/           # Widget components
+```
+
+## Available Scripts
+
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm preview` - Preview production build
+- `pnpm lint` - Run ESLint
+- `pnpm lint:fix` - Fix ESLint errors
+- `pnpm format` - Format code with Prettier

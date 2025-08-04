@@ -1,4 +1,4 @@
-export { NavigationSection } from '../../navigation';
+export { Navbar } from '../../navigation';
 export { HeroSection } from './hero-section';
 export { FeaturesSection } from './features-section';
 export { StatsSection } from './stats-section';
