@@ -8,6 +8,7 @@ import { GoalsPage } from '@/pages/goals';
 import { NotFoundPage } from '@/pages/not-found';
 import { guestRoutes } from '@/app/routes/guest-routes.tsx';
 import { appPath } from '@/shared/constants/app-path.ts';
+import { useAuth } from '@/shared/hooks/auth.tsx';
 
 export const authenticatedRoutes = createBrowserRouter([
   {
@@ -43,7 +44,7 @@ export const authenticatedRoutes = createBrowserRouter([
 ]);
 
 export function AppRouter() {
-  const user = false;
+  const user = useAuth();
 
   return <RouterProvider router={user ? authenticatedRoutes : guestRoutes} />;
 }

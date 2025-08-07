@@ -18,8 +18,12 @@ import {
   loginSchema,
 } from '@/shared/components/pages/auth/schemas.ts';
 import { Checkbox } from '@/shared/components/ui/checkbox';
+import { useAuth } from '@/shared/hooks/auth.tsx';
+import { useAlert } from '@/shared/hooks/alert.tsx';
 
 export function LoginForm() {
+  const { signIn } = useAuth();
+  const { setAlert } = useAlert();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,15 +46,10 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    try {
-      console.log('Login data:', data);
-      // TODO: Implement actual login logic here
-      // await signIn(data.email, data.password);
-    } catch (error) {
-      console.error('Login error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    const messageData = await signIn?.(data);
+
+    if (messageData) setAlert(messageData);
+    setIsLoading(false);
   };
 
   return (

@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail, Phone, User } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,11 +18,14 @@ import {
   registerSchema,
 } from '@/shared/components/pages/auth/schemas.ts';
 import { Checkbox } from '@/shared/components/ui/checkbox';
+import { useAuth } from '@/shared/hooks/auth.tsx';
 
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { signUp } = useAuth();
 
   const {
     register,
@@ -36,7 +39,6 @@ export function RegisterForm() {
       firstName: '',
       lastName: '',
       email: '',
-      phone: '',
       password: '',
       confirmPassword: '',
       acceptTerms: false,
@@ -47,15 +49,8 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
-    try {
-      console.log('Register data:', data);
-      // TODO: Implement actual registration logic here
-      // await signUp(data);
-    } catch (error) {
-      console.error('Registration error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    signUp(data);
+    setIsLoading(false);
   };
 
   return (
@@ -121,23 +116,6 @@ export function RegisterForm() {
             </div>
             {errors.email && (
               <p className="text-sm text-red-500">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="Enter your phone number"
-                className={`pl-10 ${errors.phone ? 'border-red-500' : ''}`}
-                {...register('phone')}
-              />
-            </div>
-            {errors.phone && (
-              <p className="text-sm text-red-500">{errors.phone.message}</p>
             )}
           </div>
 

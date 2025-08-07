@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
-import { BrandIcon } from '@/shared/components/brand';
 import { appPath, homeSectionName } from '@/shared/constants/app-path';
 import { Menu, X } from 'lucide-react';
+import { AbFinanceLogo } from '@/shared/components/icons/logo.tsx';
 
 interface NavigationItem {
   name: string;
@@ -37,7 +37,7 @@ export function MobileNavbar() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <a href={appPath.MAIN_PATH} className="flex items-center">
-              <BrandIcon />
+              <AbFinanceLogo />
             </a>
           </div>
 

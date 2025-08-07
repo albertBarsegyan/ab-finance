@@ -1,7 +1,7 @@
 import { Button } from '@/shared/components/ui/button.tsx';
-import { BrandIcon } from '@/shared/components/brand';
 import { appPath, homeSectionName } from '@/shared/constants/app-path.ts';
 import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
+import { AbFinanceLogo } from '@/shared/components/icons/logo.tsx';
 
 export function Navbar() {
   return (
@@ -11,7 +11,7 @@ export function Navbar() {
           href={appPath.MAIN_PATH}
           className="flex items-center justify-center"
         >
-          <BrandIcon />
+          <AbFinanceLogo />
         </a>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <a

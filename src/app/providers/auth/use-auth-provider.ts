@@ -12,36 +12,23 @@ import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/shared/config/firebase';
 import type { SignUpProps } from './index';
 import { handleFirebaseError } from '@/shared/utils/firebase.ts';
-
-export type MessageDataProps = {
-  message: string | null;
-  variant: 'success' | 'error';
-};
+import type { AlertState } from '@/app/providers/alert';
 
 type SignInProps = {
   email: string;
   password: string;
 };
 
-const MESSAGE_CLEAR_TIMEOUT_MS = 3000;
-
-const DEFAULT_MESSAGE_DATA: MessageDataProps = {
-  message: null,
-  variant: 'error',
-};
-
 export function useAuthProviderContent() {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
-  const [messageData, setMessageData] =
-    useState<MessageDataProps>(DEFAULT_MESSAGE_DATA);
 
   const signUp = async ({
     email,
     password,
-    fullname,
-    country,
-  }: SignUpProps) => {
+    firstName,
+    lastName,
+  }: SignUpProps): Promise<AlertState> => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -51,27 +38,30 @@ export function useAuthProviderContent() {
       const createdUser = userCredential.user;
       setUser(createdUser);
 
-      // Update user profile with display name
-      await updateProfile(createdUser, { displayName: fullname });
+      const fullName = `${firstName} ${lastName}`;
 
-      // Save additional user data to Firestore
+      await updateProfile(createdUser, { displayName: fullName });
+
       await setDoc(doc(db, 'users', createdUser.uid), {
-        fullname,
-        country,
+        firstName,
+        lastName,
         email,
         createdAt: serverTimestamp(),
       });
 
-      setMessageData({
+      return {
         message: 'User account created & signed in!',
         variant: 'success',
-      });
+      };
     } catch (error: unknown) {
-      setMessageData(handleFirebaseError(error));
+      return handleFirebaseError(error);
     }
   };
 
-  const signIn = async ({ email, password }: SignInProps) => {
+  const signIn = async ({
+    email,
+    password,
+  }: SignInProps): Promise<AlertState> => {
     try {
       const userResponse = await signInWithEmailAndPassword(
         auth,
@@ -79,39 +69,39 @@ export function useAuthProviderContent() {
         password
       );
       setUser(userResponse.user);
-      setMessageData({
+
+      return {
         message: 'Signed in successfully!',
         variant: 'success',
-      });
+      };
     } catch (error: unknown) {
-      console.log({ error });
-      setMessageData(handleFirebaseError(error));
+      return handleFirebaseError(error);
     }
   };
 
-  const signOut = async () => {
+  const signOut = async (): Promise<AlertState> => {
     try {
       await firebaseSignOut(auth);
       setUser(null);
 
-      setMessageData({
+      return {
         message: 'Signed out successfully!',
         variant: 'success',
-      });
+      };
     } catch (error: unknown) {
-      setMessageData(handleFirebaseError(error));
+      return handleFirebaseError(error);
     }
   };
 
-  const forgotPassword = async (email: string) => {
+  const forgotPassword = async (email: string): Promise<AlertState> => {
     try {
       await sendPasswordResetEmail(auth, email);
-      setMessageData({
+      return {
         message: 'Password reset email sent. Please check your inbox.',
         variant: 'success',
-      });
+      };
     } catch (error: unknown) {
-      setMessageData(handleFirebaseError(error));
+      return handleFirebaseError(error);
     }
   };
 
@@ -124,25 +114,6 @@ export function useAuthProviderContent() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    if (messageData.message) {
-      timeoutId = setTimeout(() => {
-        setMessageData(DEFAULT_MESSAGE_DATA);
-      }, MESSAGE_CLEAR_TIMEOUT_MS);
-
-      console.log('timeoutId start', timeoutId);
-    }
-
-    return () => {
-      if (timeoutId) {
-        console.log('timeoutId end', timeoutId);
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [messageData.message]);
-
   return {
     forgotPassword,
     user,
@@ -150,6 +121,5 @@ export function useAuthProviderContent() {
     signUp,
     signIn,
     signOut,
-    messageData,
   };
 }

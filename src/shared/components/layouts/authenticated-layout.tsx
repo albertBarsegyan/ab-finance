@@ -11,6 +11,8 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '@/shared/hooks/auth.tsx';
+import { useAlert } from '@/shared/hooks/alert.tsx';
 
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: Home },
@@ -21,12 +23,18 @@ const navigation = [
 ];
 
 export function AuthenticatedLayout() {
+  const { signOut } = useAuth();
+  const { setAlert } = useAlert();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
+  const handleSignOut = async () => {
+    const alertData = await signOut?.();
+    if (alertData) setAlert(alertData);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar */}
       <div
         className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}
       >
@@ -65,8 +73,13 @@ export function AuthenticatedLayout() {
               );
             })}
           </nav>
+
           <div className="border-t border-gray-200 p-4">
-            <Button variant="outline" className="w-full justify-start">
+            <Button
+              onClick={handleSignOut}
+              variant="outline"
+              className="w-full justify-start"
+            >
               <LogOut className="mr-3 h-5 w-5" />
               Sign Out
             </Button>
@@ -98,8 +111,13 @@ export function AuthenticatedLayout() {
               );
             })}
           </nav>
+
           <div className="border-t border-gray-200 p-4">
-            <Button variant="outline" className="w-full justify-start">
+            <Button
+              onClick={handleSignOut}
+              variant="outline"
+              className="w-full justify-start"
+            >
               <LogOut className="mr-3 h-5 w-5" />
               Sign Out
             </Button>

@@ -2,22 +2,22 @@ import React, { createContext } from 'react';
 import type { User } from 'firebase/auth';
 
 import { useAuthProviderContent } from './use-auth-provider';
+import type { AlertState } from '@/app/providers/alert';
 
 type AuthContextType = {
   user: User | null;
   initializing: boolean;
-  signUp: (props: SignUpProps) => void;
-  signIn: (props: SignInProps) => void;
-  signOut: () => void;
+  signUp?: (props: SignUpProps) => Promise<AlertState>;
+  signIn?: (props: SignInProps) => Promise<AlertState>;
+  signOut?: () => Promise<AlertState>;
   forgotPassword: (email: string) => void;
-  messageData: MessageDataProps;
 };
 
 export type SignUpProps = {
   email: string;
   password: string;
-  fullname: string;
-  country: string;
+  firstName: string;
+  lastName: string;
 };
 
 type SignInProps = {
@@ -28,17 +28,8 @@ type SignInProps = {
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   initializing: true,
-  signUp: () => {},
-  signIn: () => {},
-  signOut: () => {},
   forgotPassword: () => {},
-  messageData: { message: null, variant: 'error' },
 });
-
-type MessageDataProps = {
-  message: string | null;
-  variant: 'success' | 'error';
-};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,

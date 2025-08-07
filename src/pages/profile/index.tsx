@@ -14,16 +14,7 @@ import {
   AvatarImage,
 } from '@/shared/components/ui/avatar';
 import { Badge } from '@/shared/components/ui/badge';
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  Edit,
-  Save,
-  X,
-} from 'lucide-react';
+import { Calendar, Edit, Mail, MapPin, Save, User, X } from 'lucide-react';
 import { useState } from 'react';
 
 export function ProfilePage() {
@@ -116,20 +107,6 @@ export function ProfilePage() {
                     id="email"
                     type="email"
                     defaultValue="john.doe@example.com"
-                    disabled={!isEditing}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    defaultValue="+1 (555) 123-4567"
                     disabled={!isEditing}
                     className="pl-10"
                   />

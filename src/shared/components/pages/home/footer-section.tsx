@@ -1,13 +1,13 @@
 import { Link } from 'lucide-react';
-import { BrandIcon } from '@/shared/components/brand';
 import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
+import { AbFinanceLogo } from '@/shared/components/icons/logo.tsx';
 
 export function FooterSection() {
   return (
     <footer className="border-t">
       <SectionLayout>
         <div className="flex flex-col gap-2 sm:flex-row w-full shrink-0 items-center py-6">
-          <BrandIcon />
+          <AbFinanceLogo />
           <p className="text-xs text-gray-600 sm:ml-4">
             © 2024 abFinance. All rights reserved.
           </p>
