@@ -49,7 +49,7 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
-    signUp(data);
+    signUp?.(data);
     setIsLoading(false);
   };
 
