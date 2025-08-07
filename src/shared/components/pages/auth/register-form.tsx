@@ -19,8 +19,10 @@ import {
 } from '@/shared/components/pages/auth/schemas.ts';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { useAuth } from '@/shared/hooks/auth.tsx';
+import { useAlert } from '@/shared/hooks/alert.tsx';
 
 export function RegisterForm() {
+  const { setAlert } = useAlert();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +51,8 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
-    signUp?.(data);
+    const messageData = await signUp?.(data);
+    if (messageData) setAlert(messageData);
     setIsLoading(false);
   };
 

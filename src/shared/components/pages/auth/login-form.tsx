@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -20,8 +20,10 @@ import {
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 import { useAlert } from '@/shared/hooks/alert.tsx';
+import { appPath } from '@/shared/constants/app-path.ts';
 
 export function LoginForm() {
+  const navigate = useNavigate();
   const { signIn } = useAuth();
   const { setAlert } = useAlert();
   const [showPassword, setShowPassword] = useState(false);
@@ -46,9 +48,12 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    const messageData = await signIn?.(data);
+    const signInResponse = await signIn?.(data);
 
-    if (messageData) setAlert(messageData);
+    if (signInResponse?.messageData) setAlert(signInResponse?.messageData);
+
+    if (signInResponse?.isFirstTime) navigate(appPath.QUESTIONS);
+
     setIsLoading(false);
   };
 

@@ -9,7 +9,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { auth, db } from '@/shared/config/firebase';
+import { auth, db, firestoreCollection } from '@/shared/config/firebase';
 import type { SignUpProps } from './index';
 import { handleFirebaseError } from '@/shared/utils/firebase.ts';
 import type { AlertState } from '@/app/providers/alert';
@@ -19,9 +19,15 @@ type SignInProps = {
   password: string;
 };
 
+export interface SignInResponse {
+  messageData: AlertState;
+  isFirstTime: boolean;
+}
+
 export function useAuthProviderContent() {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
+  const [isSignInFirstTime, setIsSignInFirstTime] = useState<boolean>(false);
 
   const signUp = async ({
     email,
@@ -35,6 +41,7 @@ export function useAuthProviderContent() {
         email,
         password
       );
+
       const createdUser = userCredential.user;
       setUser(createdUser);
 
@@ -42,7 +49,7 @@ export function useAuthProviderContent() {
 
       await updateProfile(createdUser, { displayName: fullName });
 
-      await setDoc(doc(db, 'users', createdUser.uid), {
+      await setDoc(doc(db, firestoreCollection.USERS, createdUser.uid), {
         firstName,
         lastName,
         email,
@@ -61,21 +68,32 @@ export function useAuthProviderContent() {
   const signIn = async ({
     email,
     password,
-  }: SignInProps): Promise<AlertState> => {
+  }: SignInProps): Promise<SignInResponse> => {
     try {
       const userResponse = await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
+
+      const isFirstTime =
+        user?.metadata.creationTime === user?.metadata.lastSignInTime;
+
+      setIsSignInFirstTime(isFirstTime);
+
       setUser(userResponse.user);
 
-      return {
+      const messageData: AlertState = {
         message: 'Signed in successfully!',
         variant: 'success',
       };
+
+      return {
+        messageData,
+        isFirstTime,
+      };
     } catch (error: unknown) {
-      return handleFirebaseError(error);
+      return { messageData: handleFirebaseError(error), isFirstTime: false };
     }
   };
 
@@ -115,6 +133,7 @@ export function useAuthProviderContent() {
   }, []);
 
   return {
+    isSignInFirstTime,
     forgotPassword,
     user,
     initializing,

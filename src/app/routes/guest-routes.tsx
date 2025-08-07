@@ -1,9 +1,8 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { GuestLayout } from '@/shared/components/layouts/guest-layout.tsx';
 import { HomePage } from '@/pages/home';
 import { LoginPage } from '@/pages/auth/login.tsx';
 import { RegisterPage } from '@/pages/auth/register.tsx';
-import { NotFoundPage } from '@/pages/not-found.tsx';
 import { appPath } from '@/shared/constants/app-path.ts';
 
 export const guestRoutes = createBrowserRouter([
@@ -27,6 +26,6 @@ export const guestRoutes = createBrowserRouter([
   },
   {
     path: appPath.ALL,
-    element: <NotFoundPage />,
+    element: <Navigate to={appPath.MAIN_PATH} />,
   },
 ]);

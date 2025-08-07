@@ -1,50 +1,10 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { AuthenticatedLayout } from '@/shared/components/layouts/authenticated-layout';
-import { DashboardPage } from '@/pages/dashboard';
-import { ProfilePage } from '@/pages/profile';
-import { TransactionsPage } from '@/pages/transactions';
-import { BudgetsPage } from '@/pages/budgets';
-import { GoalsPage } from '@/pages/goals';
-import { NotFoundPage } from '@/pages/not-found';
+import { RouterProvider } from 'react-router-dom';
 import { guestRoutes } from '@/app/routes/guest-routes.tsx';
-import { appPath } from '@/shared/constants/app-path.ts';
 import { useAuth } from '@/shared/hooks/auth.tsx';
-
-export const authenticatedRoutes = createBrowserRouter([
-  {
-    path: appPath.MAIN_PATH,
-    element: <AuthenticatedLayout />,
-    children: [
-      {
-        index: true,
-        element: <DashboardPage />,
-      },
-      {
-        path: appPath.PROFILE,
-        element: <ProfilePage />,
-      },
-      {
-        path: appPath.TRANSACTION,
-        element: <TransactionsPage />,
-      },
-      {
-        path: appPath.BUDGET,
-        element: <BudgetsPage />,
-      },
-      {
-        path: appPath.GOALS,
-        element: <GoalsPage />,
-      },
-    ],
-  },
-  {
-    path: '*',
-    element: <NotFoundPage />,
-  },
-]);
+import { authenticatedRoutes } from '@/app/routes/authenticated-routes.tsx';
 
 export function AppRouter() {
-  const user = useAuth();
+  const { user } = useAuth();
 
   return <RouterProvider router={user ? authenticatedRoutes : guestRoutes} />;
 }

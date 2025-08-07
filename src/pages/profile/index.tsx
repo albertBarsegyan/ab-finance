@@ -16,8 +16,10 @@ import {
 import { Badge } from '@/shared/components/ui/badge';
 import { Calendar, Edit, Mail, MapPin, Save, User, X } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '@/shared/hooks/auth.tsx';
 
 export function ProfilePage() {
+  const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -63,10 +65,8 @@ export function ProfilePage() {
                 <AvatarFallback>JD</AvatarFallback>
               </Avatar>
               <div className="space-y-1">
-                <h3 className="text-lg font-medium">John Doe</h3>
-                <p className="text-sm text-muted-foreground">
-                  john.doe@example.com
-                </p>
+                <h3 className="text-lg font-medium">{user?.displayName}</h3>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
                 <Badge variant="secondary">Premium Member</Badge>
               </div>
             </div>

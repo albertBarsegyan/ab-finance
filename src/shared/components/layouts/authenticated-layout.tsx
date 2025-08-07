@@ -13,6 +13,13 @@ import {
 import { useState } from 'react';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 import { useAlert } from '@/shared/hooks/alert.tsx';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/components/ui/dialog';
 
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: Home },
@@ -23,12 +30,14 @@ const navigation = [
 ];
 
 export function AuthenticatedLayout() {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const { setAlert } = useAlert();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const location = useLocation();
 
   const handleSignOut = async () => {
+    setLogoutDialogOpen(false);
     const alertData = await signOut?.();
     if (alertData) setAlert(alertData);
   };
@@ -76,7 +85,7 @@ export function AuthenticatedLayout() {
 
           <div className="border-t border-gray-200 p-4">
             <Button
-              onClick={handleSignOut}
+              onClick={() => setLogoutDialogOpen(true)}
               variant="outline"
               className="w-full justify-start"
             >
@@ -114,7 +123,7 @@ export function AuthenticatedLayout() {
 
           <div className="border-t border-gray-200 p-4">
             <Button
-              onClick={handleSignOut}
+              onClick={() => setLogoutDialogOpen(true)}
               variant="outline"
               className="w-full justify-start"
             >
@@ -141,14 +150,36 @@ export function AuthenticatedLayout() {
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200" />
               <div className="flex items-center gap-x-4">
-                <span className="text-sm text-gray-700">John Doe</span>
+                <span className="text-sm text-gray-700">
+                  {user?.displayName}
+                </span>
               </div>
             </div>
           </div>
         </div>
+        {/* Logout Confirmation Dialog */}
+        <Dialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Logout</DialogTitle>
+            </DialogHeader>
+            <p>Are you sure you want to log out?</p>
 
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setLogoutDialogOpen(false)}
+              >
+                No
+              </Button>
+              <Button variant="destructive" onClick={handleSignOut}>
+                Yes
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <main className="py-6">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-9xl px-4 sm:px-6 lg:px-8">
             <Outlet />
           </div>
         </main>
