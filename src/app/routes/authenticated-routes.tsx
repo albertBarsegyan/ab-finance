@@ -22,10 +22,6 @@ export const authenticatedRoutes = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
-        path: appPath.QUESTIONS,
-        element: <QuestionsPage />,
-      },
-      {
         path: appPath.TRANSACTION,
         element: <TransactionsPage />,
       },
@@ -38,6 +34,10 @@ export const authenticatedRoutes = createBrowserRouter([
         element: <GoalsPage />,
       },
     ],
+  },
+  {
+    path: appPath.QUESTIONS,
+    element: <QuestionsPage />,
   },
   {
     path: appPath.ALL,

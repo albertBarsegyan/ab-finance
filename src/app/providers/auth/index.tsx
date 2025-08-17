@@ -2,7 +2,7 @@ import React, { createContext } from 'react';
 import type { User } from 'firebase/auth';
 
 import {
-  type SignInResponse,
+  type SignupResponse,
   useAuthProviderContent,
 } from './use-auth-provider';
 import type { AlertState } from '@/app/providers/alert';
@@ -11,8 +11,8 @@ type AuthContextType = {
   user: User | null;
   isSignInFirstTime: boolean;
   initializing: boolean;
-  signUp?: (props: SignUpProps) => Promise<AlertState>;
-  signIn?: (props: SignInProps) => Promise<SignInResponse>;
+  signUp?: (props: SignUpProps) => Promise<SignupResponse>;
+  signIn?: (props: SignInProps) => Promise<AlertState>;
   signOut?: () => Promise<AlertState>;
   forgotPassword: (email: string) => void;
 };

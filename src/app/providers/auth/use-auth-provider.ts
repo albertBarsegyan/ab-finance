@@ -19,7 +19,7 @@ type SignInProps = {
   password: string;
 };
 
-export interface SignInResponse {
+export interface SignupResponse {
   messageData: AlertState;
   isFirstTime: boolean;
 }
@@ -34,7 +34,7 @@ export function useAuthProviderContent() {
     password,
     firstName,
     lastName,
-  }: SignUpProps): Promise<AlertState> => {
+  }: SignUpProps): Promise<SignupResponse> => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -43,6 +43,13 @@ export function useAuthProviderContent() {
       );
 
       const createdUser = userCredential.user;
+
+      const isFirstTime =
+        createdUser?.metadata?.creationTime ===
+        createdUser?.metadata.lastSignInTime;
+      console.log('isFirstTime', isFirstTime);
+      setIsSignInFirstTime(isFirstTime);
+
       setUser(createdUser);
 
       const fullName = `${firstName} ${lastName}`;
@@ -56,35 +63,8 @@ export function useAuthProviderContent() {
         createdAt: serverTimestamp(),
       });
 
-      return {
-        message: 'User account created & signed in!',
-        variant: 'success',
-      };
-    } catch (error: unknown) {
-      return handleFirebaseError(error);
-    }
-  };
-
-  const signIn = async ({
-    email,
-    password,
-  }: SignInProps): Promise<SignInResponse> => {
-    try {
-      const userResponse = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      const isFirstTime =
-        user?.metadata.creationTime === user?.metadata.lastSignInTime;
-
-      setIsSignInFirstTime(isFirstTime);
-
-      setUser(userResponse.user);
-
       const messageData: AlertState = {
-        message: 'Signed in successfully!',
+        message: 'User account created & signed in!',
         variant: 'success',
       };
 
@@ -93,7 +73,30 @@ export function useAuthProviderContent() {
         isFirstTime,
       };
     } catch (error: unknown) {
+      console.log({ error });
       return { messageData: handleFirebaseError(error), isFirstTime: false };
+    }
+  };
+
+  const signIn = async ({
+    email,
+    password,
+  }: SignInProps): Promise<AlertState> => {
+    try {
+      const userResponse = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      setUser(userResponse.user);
+
+      return {
+        message: 'Signed in successfully!',
+        variant: 'success',
+      };
+    } catch (error: unknown) {
+      return handleFirebaseError(error);
     }
   };
 

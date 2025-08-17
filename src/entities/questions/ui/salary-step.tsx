@@ -1,21 +1,30 @@
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Label } from '@/shared/components/ui/label';
+import { Button } from '@/shared/components/ui/button.tsx';
+import { Input } from '@/shared/components/ui/input.tsx';
+import { Label } from '@/shared/components/ui/label.tsx';
 import {
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/shared/components/ui/card';
+} from '@/shared/components/ui/card.tsx';
 
 type Props = {
   salary: string;
   setSalary: (v: string) => void;
   onBack: () => void;
   onSubmit: () => void;
+  disabled?: boolean;
+  isLoading?: boolean;
 };
 
-export function SalaryStep({ salary, setSalary, onBack, onSubmit }: Props) {
+export function SalaryStep({
+  salary,
+  setSalary,
+  onBack,
+  onSubmit,
+  disabled,
+  isLoading,
+}: Props) {
   return (
     <form
       onSubmit={e => {
@@ -23,7 +32,7 @@ export function SalaryStep({ salary, setSalary, onBack, onSubmit }: Props) {
         onSubmit();
       }}
     >
-      <CardHeader>
+      <CardHeader className="mb-4">
         <CardTitle>3. Write about your salary info</CardTitle>
       </CardHeader>
       <CardContent>
@@ -47,8 +56,8 @@ export function SalaryStep({ salary, setSalary, onBack, onSubmit }: Props) {
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button type="submit" disabled={!salary}>
-          Submit
+        <Button type="submit" disabled={disabled || !salary}>
+          {isLoading ? 'Saving...' : 'Submit'}
         </Button>
       </CardFooter>
     </form>

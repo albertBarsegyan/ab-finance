@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -20,9 +20,12 @@ import {
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 import { useAlert } from '@/shared/hooks/alert.tsx';
+import { appPath } from '@/shared/constants/app-path.ts';
 
 export function RegisterForm() {
   const { setAlert } = useAlert();
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,9 +54,13 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
-    const messageData = await signUp?.(data);
-    if (messageData) setAlert(messageData);
+    const signUpResponse = await signUp?.(data);
+    if (signUpResponse?.messageData) setAlert(signUpResponse?.messageData);
     setIsLoading(false);
+
+    console.log('signUpResponse', signUpResponse);
+
+    if (signUpResponse?.isFirstTime) navigate(appPath.QUESTIONS);
   };
 
   return (

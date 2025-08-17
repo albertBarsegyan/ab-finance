@@ -1,12 +1,12 @@
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Label } from '@/shared/components/ui/label';
+import { Button } from '@/shared/components/ui/button.tsx';
+import { Input } from '@/shared/components/ui/input.tsx';
+import { Label } from '@/shared/components/ui/label.tsx';
 import {
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/shared/components/ui/card';
+} from '@/shared/components/ui/card.tsx';
 
 const GOAL_VARIANTS = [
   { key: 'car', label: 'Car' },

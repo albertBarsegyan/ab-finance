@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from '@/shared/components/ui/card';
+import { Card } from '@/shared/components/ui/card.tsx';
 
 export function QuestionsLayout({ children }: { children: React.ReactNode }) {
   return (
