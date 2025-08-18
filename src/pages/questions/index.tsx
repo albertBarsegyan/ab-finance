@@ -13,18 +13,32 @@ import { useAuth } from '@/shared/hooks/auth';
 import { appPath } from '@/shared/constants/app-path.ts';
 
 export default function QuestionsPage() {
-  const { user } = useAuth();
+  const { user, initializing } = useAuth();
   const { setAlert } = useAlert();
+
   const [state, dispatch] = useReducer(questionsReducer, initialQuestionsState);
+
   const {
     saveQuestions,
     isQuestionsComplete,
-    hasExistingAnswers,
     isLoading,
     isCheckingExisting,
     resetExistingAnswers,
     existingAnswers,
   } = useQuestions(user);
+
+  if (initializing) {
+    return (
+      <QuestionsLayout>
+        <div className="text-center py-8">
+          <h2 className="text-2xl font-semibold mb-4">Loading...</h2>
+          <p className="text-muted-foreground">
+            Please wait while we verify your authentication...
+          </p>
+        </div>
+      </QuestionsLayout>
+    );
+  }
 
   if (isCheckingExisting) {
     return (
@@ -39,7 +53,7 @@ export default function QuestionsPage() {
     );
   }
 
-  if (hasExistingAnswers) {
+  if (existingAnswers) {
     return (
       <QuestionsLayout>
         <div className="text-center p-8">
@@ -50,29 +64,28 @@ export default function QuestionsPage() {
             You have already completed the questions. Your answers have been
             saved.
           </p>
-          {existingAnswers && (
-            <div className="max-w-md mx-auto mb-6 p-4 bg-muted rounded-lg text-left">
-              <h3 className="font-semibold mb-2">Your Previous Answers:</h3>
-              <div className="space-y-2 text-sm">
-                <p>
-                  <strong>Goal:</strong>{' '}
-                  {existingAnswers?.goal === 'custom'
-                    ? existingAnswers?.customGoal
-                    : existingAnswers?.goal}
-                </p>
-                <p>
-                  <strong>Goal Price:</strong> {existingAnswers.goalPrice}{' '}
-                  {existingAnswers && existingAnswers?.currency === 'other'
-                    ? existingAnswers?.otherCurrency
-                    : existingAnswers.currency?.toUpperCase()}
-                </p>
 
-                <p>
-                  <strong>Salary:</strong> {existingAnswers.salary}
-                </p>
-              </div>
+          <div className="max-w-md mx-auto mb-6 p-4 bg-muted rounded-lg text-left">
+            <h3 className="font-semibold mb-2">Your Previous Answers:</h3>
+            <div className="space-y-2 text-sm">
+              <p>
+                <strong>Goal:</strong>{' '}
+                {existingAnswers?.goal === 'custom'
+                  ? existingAnswers?.customGoal
+                  : existingAnswers?.goal}
+              </p>
+              <p>
+                <strong>Goal Price:</strong> {existingAnswers.goalPrice}{' '}
+                {existingAnswers?.currency === 'other'
+                  ? existingAnswers?.otherCurrency
+                  : existingAnswers.currency?.toUpperCase()}
+              </p>
+              <p>
+                <strong>Salary:</strong> {existingAnswers.salary}
+              </p>
             </div>
-          )}
+          </div>
+
           <div className="flex gap-4 justify-center">
             <a
               href={appPath.MAIN_PATH}

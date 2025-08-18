@@ -8,7 +8,7 @@ import {
   signOut as firebaseSignOut,
   updateProfile,
 } from 'firebase/auth';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { auth, db, firestoreCollection } from '@/shared/config/firebase';
 import type { SignUpProps } from './index';
 import { handleFirebaseError } from '@/shared/utils/firebase.ts';
@@ -19,22 +19,43 @@ type SignInProps = {
   password: string;
 };
 
-export interface SignupResponse {
-  messageData: AlertState;
+export interface UserAdditional {
   isFirstTime: boolean;
 }
 
 export function useAuthProviderContent() {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
-  const [isSignInFirstTime, setIsSignInFirstTime] = useState<boolean>(false);
+  const [userAdditional, setUserAdditional] = useState<UserAdditional | null>(
+    null
+  );
+
+  const fetchUserAdditional = async (uid: string) => {
+    try {
+      const userDocRef = doc(db, firestoreCollection.USERS, uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data() as UserAdditional;
+        setUserAdditional(userData);
+        return userData;
+      } else {
+        setUserAdditional(null);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching user document:', error);
+      setUserAdditional(null);
+      return null;
+    }
+  };
 
   const signUp = async ({
     email,
     password,
     firstName,
     lastName,
-  }: SignUpProps): Promise<SignupResponse> => {
+  }: SignUpProps): Promise<AlertState> => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -44,37 +65,34 @@ export function useAuthProviderContent() {
 
       const createdUser = userCredential.user;
 
-      const isFirstTime =
-        createdUser?.metadata?.creationTime ===
-        createdUser?.metadata.lastSignInTime;
-      console.log('isFirstTime', isFirstTime);
-      setIsSignInFirstTime(isFirstTime);
-
       setUser(createdUser);
 
       const fullName = `${firstName} ${lastName}`;
 
       await updateProfile(createdUser, { displayName: fullName });
 
-      await setDoc(doc(db, firestoreCollection.USERS, createdUser.uid), {
+      const userData = {
         firstName,
         lastName,
         email,
+        isFirstTime: true,
         createdAt: serverTimestamp(),
-      });
+      };
 
-      const messageData: AlertState = {
+      await setDoc(
+        doc(db, firestoreCollection.USERS, createdUser.uid),
+        userData
+      );
+
+      setUserAdditional({ isFirstTime: true });
+
+      return {
         message: 'User account created & signed in!',
         variant: 'success',
       };
-
-      return {
-        messageData,
-        isFirstTime,
-      };
     } catch (error: unknown) {
       console.log({ error });
-      return { messageData: handleFirebaseError(error), isFirstTime: false };
+      return handleFirebaseError(error);
     }
   };
 
@@ -91,6 +109,9 @@ export function useAuthProviderContent() {
 
       setUser(userResponse.user);
 
+      if (userResponse.user.uid)
+        await fetchUserAdditional(userResponse.user.uid);
+
       return {
         message: 'Signed in successfully!',
         variant: 'success',
@@ -104,6 +125,7 @@ export function useAuthProviderContent() {
     try {
       await firebaseSignOut(auth);
       setUser(null);
+      setUserAdditional(null);
 
       return {
         message: 'Signed out successfully!',
@@ -127,8 +149,11 @@ export function useAuthProviderContent() {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, userData => {
+    const unsubscribe = onAuthStateChanged(auth, async userData => {
       setUser(userData);
+
+      if (userData?.uid) await fetchUserAdditional(userData.uid);
+
       setInitializing(false);
     });
 
@@ -136,12 +161,13 @@ export function useAuthProviderContent() {
   }, []);
 
   return {
-    isSignInFirstTime,
     forgotPassword,
     user,
+    userAdditional,
     initializing,
     signUp,
     signIn,
     signOut,
+    fetchUserDocument: fetchUserAdditional,
   };
 }

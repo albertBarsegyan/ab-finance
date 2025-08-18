@@ -3,9 +3,10 @@ import { guestRoutes } from '@/app/routes/guest-routes.tsx';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 import { authenticatedRoutes } from '@/app/routes/authenticated-routes.tsx';
 import { LoaderWrapper } from '@/shared/components/custom/loader';
+import QuestionsPage from '@/pages/questions';
 
 export function AppRouter() {
-  const { user, initializing } = useAuth();
+  const { user, initializing, userAdditional } = useAuth();
 
   if (initializing)
     return (
@@ -16,6 +17,8 @@ export function AppRouter() {
         loading
       />
     );
+
+  if (userAdditional?.isFirstTime) return <QuestionsPage />;
 
   return <RouterProvider router={user ? authenticatedRoutes : guestRoutes} />;
 }

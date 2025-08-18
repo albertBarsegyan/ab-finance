@@ -32,11 +32,11 @@ export function SalaryStep({
         onSubmit();
       }}
     >
-      <CardHeader className="mb-4">
+      <CardHeader>
         <CardTitle>3. Write about your salary info</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mt-8">
           <div>
             <Label htmlFor="salary">Salary</Label>
             <Input
@@ -52,7 +52,7 @@ export function SalaryStep({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex justify-between mt-4">
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>

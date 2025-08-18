@@ -2,19 +2,20 @@ import React, { createContext } from 'react';
 import type { User } from 'firebase/auth';
 
 import {
-  type SignupResponse,
   useAuthProviderContent,
+  type UserAdditional,
 } from './use-auth-provider';
 import type { AlertState } from '@/app/providers/alert';
 
 type AuthContextType = {
   user: User | null;
-  isSignInFirstTime: boolean;
+  userAdditional: UserAdditional | null;
   initializing: boolean;
-  signUp?: (props: SignUpProps) => Promise<SignupResponse>;
+  signUp?: (props: SignUpProps) => Promise<AlertState>;
   signIn?: (props: SignInProps) => Promise<AlertState>;
   signOut?: () => Promise<AlertState>;
   forgotPassword: (email: string) => void;
+  fetchUserDocument: (uid: string) => Promise<UserAdditional | null>;
 };
 
 export type SignUpProps = {
@@ -31,9 +32,10 @@ type SignInProps = {
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
+  userAdditional: null,
   initializing: true,
   forgotPassword: () => {},
-  isSignInFirstTime: false,
+  fetchUserDocument: async () => null,
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({

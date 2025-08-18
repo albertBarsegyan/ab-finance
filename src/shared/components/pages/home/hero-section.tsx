@@ -3,6 +3,8 @@ import { Badge, Play, Star } from 'lucide-react';
 import { LazyImage } from '@/shared/components/lazy-image';
 import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 
+import pigImage from '@/shared/assets/images/pig-image.jpg';
+
 export function HeroSection() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-br from-green-50 to-emerald-50">
@@ -45,7 +47,7 @@ export function HeroSection() {
           </div>
           <div className="flex items-center justify-center">
             <LazyImage
-              src="/placeholder.svg?height=600&width=400"
+              src={pigImage}
               width="600"
               height="400"
               alt="abFinance App Screenshot"

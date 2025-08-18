@@ -2,6 +2,8 @@ import { Badge } from 'lucide-react';
 import { LazyImage } from '@/shared/components/lazy-image';
 import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 
+import pigImage from '@/shared/assets/images/pig-image.jpg';
+
 export function StatsSection() {
   return (
     <section id="stats" className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
@@ -43,7 +45,7 @@ export function StatsSection() {
           </div>
           <div className="flex items-center justify-center">
             <LazyImage
-              src="/placeholder.svg?height=400&width=600"
+              src={pigImage}
               width="600"
               height="400"
               alt="Financial Dashboard"

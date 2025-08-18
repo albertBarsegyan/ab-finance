@@ -3,7 +3,6 @@ import { appPath } from '@/shared/constants/app-path.ts';
 import { AuthenticatedLayout } from '@/shared/components/layouts/authenticated-layout.tsx';
 import { DashboardPage } from '@/pages/dashboard';
 import { ProfilePage } from '@/pages/profile';
-import QuestionsPage from '@/pages/questions';
 import { TransactionsPage } from '@/pages/transactions';
 import { BudgetsPage } from '@/pages/budgets';
 import { GoalsPage } from '@/pages/goals';
@@ -34,10 +33,6 @@ export const authenticatedRoutes = createBrowserRouter([
         element: <GoalsPage />,
       },
     ],
-  },
-  {
-    path: appPath.QUESTIONS,
-    element: <QuestionsPage />,
   },
   {
     path: appPath.ALL,

@@ -19,8 +19,16 @@ import { useState } from 'react';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 
 export function ProfilePage() {
-  const { user } = useAuth();
+  const { user, userAdditional } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+
+  // Get initials for avatar fallback
+  const getInitials = () => {
+    if (userAdditional?.firstName && userAdditional?.lastName) {
+      return `${userAdditional.firstName[0]}${userAdditional.lastName[0]}`.toUpperCase();
+    }
+    return user?.displayName?.slice(0, 2).toUpperCase() || 'U';
+  };
 
   return (
     <div className="space-y-6">
@@ -62,12 +70,16 @@ export function ProfilePage() {
             <div className="flex items-center space-x-4">
               <Avatar className="h-20 w-20">
                 <AvatarImage src="/placeholder-avatar.jpg" alt="Profile" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarFallback>{getInitials()}</AvatarFallback>
               </Avatar>
               <div className="space-y-1">
-                <h3 className="text-lg font-medium">{user?.displayName}</h3>
+                <h3 className="text-lg font-medium">
+                  {userAdditional ? `${userAdditional.firstName} ${userAdditional.lastName}` : user?.displayName || 'User'}
+                </h3>
                 <p className="text-sm text-muted-foreground">{user?.email}</p>
-                <Badge variant="secondary">Premium Member</Badge>
+                <Badge variant="secondary">
+                  {userAdditional?.isFirstTime ? 'New Member' : 'Premium Member'}
+                </Badge>
               </div>
             </div>
 
@@ -79,7 +91,7 @@ export function ProfilePage() {
                     <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="firstName"
-                      defaultValue="John"
+                      defaultValue={userAdditional?.firstName || ''}
                       disabled={!isEditing}
                       className="pl-10"
                     />
@@ -91,7 +103,7 @@ export function ProfilePage() {
                     <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="lastName"
-                      defaultValue="Doe"
+                      defaultValue={userAdditional?.lastName || ''}
                       disabled={!isEditing}
                       className="pl-10"
                     />
@@ -106,7 +118,7 @@ export function ProfilePage() {
                   <Input
                     id="email"
                     type="email"
-                    defaultValue="john.doe@example.com"
+                    defaultValue={userAdditional?.email || user?.email || ''}
                     disabled={!isEditing}
                     className="pl-10"
                   />
@@ -146,6 +158,27 @@ export function ProfilePage() {
                 <Save className="mr-2 h-4 w-4" />
                 Save Changes
               </Button>
+            )}
+
+            {/* User Metadata */}
+            {userAdditional && (
+              <div className="pt-4 border-t space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Member Since:</span>
+                  <span className="font-medium">
+                    {userAdditional.createdAt?.toDate?.() 
+                      ? new Date(userAdditional.createdAt.toDate()).toLocaleDateString()
+                      : 'N/A'
+                    }
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Account Type:</span>
+                  <Badge variant="outline">
+                    {userAdditional.isFirstTime ? 'New Account' : 'Established'}
+                  </Badge>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
