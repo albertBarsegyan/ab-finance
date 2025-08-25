@@ -1,11 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import {
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-} from 'firebase/firestore';
+import { useCallback, useState } from 'react';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db, firestoreCollection } from '@/shared/config/firebase.ts';
 import type { QuestionsState } from '@/entities/questions/model/questions-reducer.ts';
 import { handleFirebaseError } from '@/shared/utils/firebase.ts';
@@ -14,39 +8,6 @@ import type { User } from 'firebase/auth';
 
 export const useQuestions = (user: User | null) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isCheckingExisting, setIsCheckingExisting] = useState(false);
-  const [existingAnswers, setExistingAnswers] = useState<QuestionsState | null>(
-    null
-  );
-
-  const checkExistingAnswers = useCallback(async () => {
-    if (!user?.uid) return;
-
-    setIsCheckingExisting(true);
-
-    try {
-      const questionsRef = doc(db, firestoreCollection.QUESTIONS, user.uid);
-      const docSnap = await getDoc(questionsRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-
-        setExistingAnswers(data as QuestionsState);
-      } else setExistingAnswers(null);
-    } catch (error) {
-      console.error('Error checking existing answers:', error);
-    } finally {
-      setIsCheckingExisting(false);
-    }
-  }, [user?.uid]);
-
-  const resetExistingAnswers = useCallback(() => {
-    setExistingAnswers(null);
-  }, []);
-
-  useEffect(() => {
-    if (user?.uid) void checkExistingAnswers();
-  }, [user?.uid, checkExistingAnswers]);
 
   const saveQuestions = useCallback(
     async (questionsData: QuestionsState): Promise<AlertState> => {
@@ -60,11 +21,9 @@ export const useQuestions = (user: User | null) => {
 
       const isComplete =
         questionsData.goal &&
-        (questionsData.goal !== 'custom' || questionsData.customGoal) &&
         questionsData.goalPrice &&
-        questionsData.currency &&
-        (questionsData.currency !== 'other' || questionsData.otherCurrency) &&
-        questionsData.salary;
+        questionsData.goalCurrency &&
+        questionsData.salaryPrice;
 
       if (!isComplete) {
         return {
@@ -82,10 +41,6 @@ export const useQuestions = (user: User | null) => {
           userId: user.uid,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-        });
-
-        await updateDoc(doc(db, firestoreCollection.USERS, user.uid), {
-          isFirstTime: false,
         });
 
         return {
@@ -106,11 +61,9 @@ export const useQuestions = (user: User | null) => {
     (questionsData: QuestionsState): boolean => {
       return Boolean(
         questionsData.goal &&
-          (questionsData.goal !== 'custom' || questionsData.customGoal) &&
           questionsData.goalPrice &&
-          questionsData.currency &&
-          (questionsData.currency !== 'other' || questionsData.otherCurrency) &&
-          questionsData.salary
+          questionsData.goalCurrency &&
+          questionsData.salaryPrice
       );
     },
     []
@@ -120,9 +73,5 @@ export const useQuestions = (user: User | null) => {
     saveQuestions,
     isQuestionsComplete,
     isLoading,
-    isCheckingExisting,
-    existingAnswers,
-    resetExistingAnswers,
-    checkExistingAnswers,
   };
 };

@@ -21,6 +21,10 @@ type SignInProps = {
 
 export interface UserAdditional {
   isFirstTime: boolean;
+  firstName: string;
+  lastName: string;
+  email: string;
+  createdAt: string;
 }
 
 export function useAuthProviderContent() {
@@ -79,12 +83,18 @@ export function useAuthProviderContent() {
         createdAt: serverTimestamp(),
       };
 
-      await setDoc(
-        doc(db, firestoreCollection.USERS, createdUser.uid),
-        userData
-      );
+      const docRef = doc(db, firestoreCollection.USERS, createdUser.uid);
 
-      setUserAdditional({ isFirstTime: true });
+      await setDoc(docRef, userData);
+
+      const snapshot = await getDoc(docRef);
+
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        console.log({ data });
+
+        setUserAdditional(data as UserAdditional);
+      }
 
       return {
         message: 'User account created & signed in!',

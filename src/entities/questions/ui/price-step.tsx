@@ -7,22 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card.tsx';
-
-const CURRENCIES = [
-  { key: 'usd', label: '$ USD' },
-  { key: 'eur', label: '€ EUR' },
-  { key: 'gbp', label: '£ GBP' },
-  { key: 'jpy', label: '¥ JPY' },
-  { key: 'other', label: 'Other' },
-];
+import { currencies } from '@/shared/constants/currencies.ts';
 
 type Props = {
   goalPrice: string;
   setGoalPrice: (v: string) => void;
   currency: string;
   setCurrency: (v: string) => void;
-  otherCurrency: string;
-  setOtherCurrency: (v: string) => void;
   onNext: () => void;
   onBack: () => void;
 };
@@ -32,8 +23,6 @@ export function PriceStep({
   setGoalPrice,
   currency,
   setCurrency,
-  otherCurrency,
-  setOtherCurrency,
   onNext,
   onBack,
 }: Props) {
@@ -45,11 +34,9 @@ export function PriceStep({
       <CardContent>
         <div className="flex flex-col gap-4">
           <div>
-            <Label htmlFor="goal-price">Goal Price</Label>
+            <Label htmlFor="goal-price">Goal Price (only numbers)</Label>
             <Input
               id="goal-price"
-              type="number"
-              min="0"
               value={goalPrice}
               onChange={e => setGoalPrice(e.target.value)}
               placeholder="Enter amount..."
@@ -62,24 +49,19 @@ export function PriceStep({
             <select
               id="currency"
               value={currency}
-              onChange={e => setCurrency(e.target.value)}
+              onChange={e => {
+                const value = e.target.value;
+                console.log({ value });
+                setCurrency(e.target.value);
+              }}
               className="mt-1 border rounded-md px-3 py-2 w-full bg-background"
             >
-              {CURRENCIES.map(cur => (
-                <option key={cur.key} value={cur.key}>
-                  {cur.label}
+              {currencies.map(cur => (
+                <option key={cur.code} value={cur.code}>
+                  {cur.code} ({cur.symbol})
                 </option>
               ))}
             </select>
-            {currency === 'other' && (
-              <Input
-                value={otherCurrency}
-                onChange={e => setOtherCurrency(e.target.value)}
-                placeholder="Enter currency..."
-                className="mt-2"
-                required
-              />
-            )}
           </div>
         </div>
       </CardContent>
@@ -87,13 +69,7 @@ export function PriceStep({
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button
-          type="button"
-          onClick={onNext}
-          disabled={
-            !goalPrice || (currency === 'other' && !otherCurrency.trim())
-          }
-        >
+        <Button type="button" onClick={onNext} disabled={!goalPrice}>
           Next
         </Button>
       </CardFooter>

@@ -7,9 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card.tsx';
+import { currencies } from '@/shared/constants/currencies.ts';
 
 type Props = {
   salary: string;
+  salaryCurrency: string;
+  setSalaryCurrency: (newCurrency: string) => void;
   setSalary: (v: string) => void;
   onBack: () => void;
   onSubmit: () => void;
@@ -24,6 +27,8 @@ export function SalaryStep({
   onSubmit,
   disabled,
   isLoading,
+  salaryCurrency,
+  setSalaryCurrency,
 }: Props) {
   return (
     <form
@@ -36,19 +41,35 @@ export function SalaryStep({
         <CardTitle>3. Write about your salary info</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-4 mt-8">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mt-8">
+            <div>
+              <Label htmlFor="salary">Salary (only numbers)</Label>
+              <Input
+                id="salary"
+                value={salary}
+                onChange={e => setSalary(e.target.value)}
+                placeholder="Enter your salary..."
+                className="mt-1"
+                required
+              />
+            </div>
+          </div>
+
           <div>
-            <Label htmlFor="salary">Salary</Label>
-            <Input
-              id="salary"
-              type="number"
-              min="0"
-              value={salary}
-              onChange={e => setSalary(e.target.value)}
-              placeholder="Enter your salary..."
-              className="mt-1"
-              required
-            />
+            <Label htmlFor="currency">Currency</Label>
+            <select
+              id="currency"
+              value={salaryCurrency}
+              onChange={e => setSalaryCurrency(e.target.value)}
+              className="mt-1 border rounded-md px-3 py-2 w-full bg-background"
+            >
+              {currencies.map(cur => (
+                <option key={cur.code} value={cur.code}>
+                  {cur.code} ({cur.symbol})
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </CardContent>

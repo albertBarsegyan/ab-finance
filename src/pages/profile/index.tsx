@@ -22,7 +22,6 @@ export function ProfilePage() {
   const { user, userAdditional } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
 
-  // Get initials for avatar fallback
   const getInitials = () => {
     if (userAdditional?.firstName && userAdditional?.lastName) {
       return `${userAdditional.firstName[0]}${userAdditional.lastName[0]}`.toUpperCase();
@@ -74,11 +73,15 @@ export function ProfilePage() {
               </Avatar>
               <div className="space-y-1">
                 <h3 className="text-lg font-medium">
-                  {userAdditional ? `${userAdditional.firstName} ${userAdditional.lastName}` : user?.displayName || 'User'}
+                  {userAdditional
+                    ? `${userAdditional.firstName} ${userAdditional.lastName}`
+                    : user?.displayName || 'User'}
                 </h3>
                 <p className="text-sm text-muted-foreground">{user?.email}</p>
                 <Badge variant="secondary">
-                  {userAdditional?.isFirstTime ? 'New Member' : 'Premium Member'}
+                  {userAdditional?.isFirstTime
+                    ? 'New Member'
+                    : 'Premium Member'}
                 </Badge>
               </div>
             </div>
@@ -166,10 +169,9 @@ export function ProfilePage() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Member Since:</span>
                   <span className="font-medium">
-                    {userAdditional.createdAt?.toDate?.() 
-                      ? new Date(userAdditional.createdAt.toDate()).toLocaleDateString()
-                      : 'N/A'
-                    }
+                    {userAdditional.createdAt
+                      ? new Date(userAdditional.createdAt).toLocaleDateString()
+                      : 'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
