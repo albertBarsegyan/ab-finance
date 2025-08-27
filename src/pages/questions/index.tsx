@@ -1,8 +1,7 @@
-import { useEffect, useReducer } from 'react';
+import { useReducer } from 'react';
 import { QuestionsLayout } from '@/entities/questions/ui/layout.tsx';
 import { GoalStep } from '@/entities/questions/ui/goal-step.tsx';
-import { PriceStep } from '@/entities/questions/ui/price-step.tsx';
-import { SalaryStep } from '@/entities/questions/ui/salary-step.tsx';
+import { DurationStep } from '@/entities/questions/ui/duration-step.tsx';
 import {
   initialQuestionsState,
   questionsReducer,
@@ -12,13 +11,11 @@ import { useAlert } from '@/shared/hooks/alert';
 import { useAuth } from '@/shared/hooks/auth';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db, firestoreCollection } from '@/shared/config/firebase.ts';
-import { useNavigate } from 'react-router-dom';
-import { appPath } from '@/shared/constants/app-path.ts';
+import { PriceStep } from '@/entities/questions/ui/price-step.tsx';
 
 export default function QuestionsPage() {
-  const { user, initializing, fetchUserDocument, userAdditional } = useAuth();
+  const { user, initializing, fetchUserDocument } = useAuth();
   const { setAlert } = useAlert();
-  const navigate = useNavigate();
 
   const [state, dispatch] = useReducer(questionsReducer, initialQuestionsState);
 
@@ -36,14 +33,9 @@ export default function QuestionsPage() {
 
       await fetchUserDocument(user?.uid);
     }
+
     setAlert(result);
   };
-
-  useEffect(() => {
-    if (userAdditional?.isFirstTime === false) navigate(appPath.MAIN_PATH);
-  }, [navigate, userAdditional?.isFirstTime]);
-
-  if (userAdditional?.isFirstTime === false) return null;
 
   if (initializing || isLoading) {
     return (
@@ -67,7 +59,19 @@ export default function QuestionsPage() {
           onNext={() => dispatch({ type: 'SET_STEP', step: 2 })}
         />
       )}
+
       {state.step === 2 && (
+        <DurationStep
+          goalDuration={state.goalDuration}
+          setGoalDuration={goalDuration =>
+            dispatch({ type: 'SET_GOAL_DURATION', duration: goalDuration })
+          }
+          onNext={() => dispatch({ type: 'SET_STEP', step: 3 })}
+          onBack={() => dispatch({ type: 'SET_STEP', step: 1 })}
+        />
+      )}
+
+      {state.step === 3 && (
         <PriceStep
           goalPrice={state.goalPrice}
           setGoalPrice={goalPrice =>
@@ -77,20 +81,8 @@ export default function QuestionsPage() {
           setCurrency={currency => {
             dispatch({ type: 'SET_GOAL_CURRENCY', currency });
           }}
-          onNext={() => dispatch({ type: 'SET_STEP', step: 3 })}
-          onBack={() => dispatch({ type: 'SET_STEP', step: 1 })}
-        />
-      )}
-      {state.step === 3 && (
-        <SalaryStep
-          setSalaryCurrency={currency =>
-            dispatch({ type: 'SET_SALARY_CURRENCY', currency })
-          }
-          salaryCurrency={state.salaryCurrency}
-          salary={state.salaryPrice}
-          setSalary={salary => dispatch({ type: 'SET_SALARY', salary })}
-          onBack={() => dispatch({ type: 'SET_STEP', step: 2 })}
           onSubmit={onSubmit}
+          onBack={() => dispatch({ type: 'SET_STEP', step: 2 })}
           disabled={!isQuestionsComplete(state) || isLoading}
           isLoading={isLoading}
         />

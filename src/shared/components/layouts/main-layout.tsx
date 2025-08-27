@@ -4,7 +4,6 @@ import {
   CreditCard,
   Home,
   LogOut,
-  Menu,
   PiggyBank,
   Target,
   User,
@@ -20,17 +19,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog';
+import { appPath } from '@/shared/constants/app-path.ts';
+import { AbFinanceLogo } from '@/shared/components/icons/logo.tsx';
 
 const navigation = [
-  { name: 'Dashboard', href: '/app', icon: Home },
-  { name: 'Profile', href: '/app/profile', icon: User },
-  { name: 'Transactions', href: '/app/transactions', icon: CreditCard },
-  { name: 'Budgets', href: '/app/budgets', icon: PiggyBank },
-  { name: 'Goals', href: '/app/goals', icon: Target },
+  { name: 'Overview', href: appPath.MAIN_PATH, icon: Home },
+  { name: 'Income', href: appPath.INCOME, icon: PiggyBank },
+  { name: 'Expense', href: appPath.EXPENSE, icon: CreditCard },
+  { name: 'Goals', href: appPath.GOALS, icon: Target },
+  { name: 'Profile', href: appPath.PROFILE, icon: User },
 ];
 
-export function AuthenticatedLayout() {
-  const { signOut, user } = useAuth();
+export function MainLayout() {
+  const { signOut } = useAuth();
   const { setAlert } = useAlert();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
@@ -99,7 +100,9 @@ export function AuthenticatedLayout() {
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
           <div className="flex items-center h-16 px-4">
-            <h1 className="text-xl font-bold text-gray-900">abFinance</h1>
+            <h1 className="text-xl font-bold text-gray-900">
+              <AbFinanceLogo />
+            </h1>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map(item => {
@@ -134,30 +137,7 @@ export function AuthenticatedLayout() {
         </div>
       </div>
 
-      {/* Main content */}
       <div className="lg:pl-64">
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <div className="flex flex-1" />
-            <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200" />
-              <div className="flex items-center gap-x-4">
-                <span className="text-sm text-gray-700">
-                  {user?.displayName}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Logout Confirmation Dialog */}
         <Dialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
           <DialogContent>
             <DialogHeader>

@@ -15,7 +15,7 @@ const firebaseConfig = {
 
 export const firestoreCollection = {
   USERS: 'users',
-  QUESTIONS: 'questions',
+  GOALS: 'goals',
 };
 
 export const firebaseApp = initializeApp(firebaseConfig);

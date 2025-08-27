@@ -14,8 +14,10 @@ type Props = {
   setGoalPrice: (v: string) => void;
   currency: string;
   setCurrency: (v: string) => void;
-  onNext: () => void;
+  onSubmit: () => void;
   onBack: () => void;
+  disabled?: boolean;
+  isLoading?: boolean;
 };
 
 export function PriceStep({
@@ -23,13 +25,15 @@ export function PriceStep({
   setGoalPrice,
   currency,
   setCurrency,
-  onNext,
   onBack,
+  disabled,
+  onSubmit,
+  isLoading,
 }: Props) {
   return (
     <>
       <CardHeader>
-        <CardTitle>2. What is your goal price?</CardTitle>
+        <CardTitle>3. What's your goal price?</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4">
@@ -69,8 +73,9 @@ export function PriceStep({
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button type="button" onClick={onNext} disabled={!goalPrice}>
-          Next
+
+        <Button onClick={onSubmit} disabled={disabled}>
+          {isLoading ? 'Saving...' : 'Submit'}
         </Button>
       </CardFooter>
     </>

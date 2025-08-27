@@ -9,16 +9,16 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Badge } from '@/shared/components/ui/badge';
 import {
-  Search,
-  Filter,
-  Plus,
-  Download,
-  TrendingUp,
-  TrendingDown,
-  CreditCard,
-  ShoppingBag,
   Car,
+  CreditCard,
+  Download,
+  Filter,
   Home,
+  Plus,
+  Search,
+  ShoppingBag,
+  TrendingDown,
+  TrendingUp,
   Utensils,
 } from 'lucide-react';
 
@@ -90,14 +90,14 @@ const categories = [
   'Shopping',
 ];
 
-export function TransactionsPage() {
+export function ExpensesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Expenses</h1>
           <p className="text-muted-foreground">
-            View and manage your financial transactions.
+            View and manage your financial expenses.
           </p>
         </div>
         <div className="flex items-center space-x-2">

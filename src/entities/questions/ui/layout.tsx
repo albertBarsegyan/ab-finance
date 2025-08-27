@@ -3,8 +3,8 @@ import { Card } from '@/shared/components/ui/card.tsx';
 
 export function QuestionsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex justify-center items-center min-h-[80vh] bg-background">
-      <Card className="w-full max-w-md">{children}</Card>
+    <div className="flex justify-center items-center min-h-[100vh] bg-background overflow-yauto">
+      <Card className="w-full max-w-md my-6">{children}</Card>
     </div>
   );
 }

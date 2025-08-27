@@ -1,16 +1,16 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { appPath } from '@/shared/constants/app-path.ts';
-import { AuthenticatedLayout } from '@/shared/components/layouts/authenticated-layout.tsx';
+import { MainLayout } from '@/shared/components/layouts/main-layout.tsx';
 import { DashboardPage } from '@/pages/dashboard';
 import { ProfilePage } from '@/pages/profile';
-import { TransactionsPage } from '@/pages/transactions';
+import { ExpensesPage } from '@/pages/expenses';
 import { BudgetsPage } from '@/pages/budgets';
 import { GoalsPage } from '@/pages/goals';
 
 export const authenticatedRoutes = createBrowserRouter([
   {
     path: appPath.MAIN_PATH,
-    element: <AuthenticatedLayout />,
+    element: <MainLayout />,
     children: [
       {
         index: true,
@@ -21,11 +21,11 @@ export const authenticatedRoutes = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
-        path: appPath.TRANSACTION,
-        element: <TransactionsPage />,
+        path: appPath.EXPENSE,
+        element: <ExpensesPage />,
       },
       {
-        path: appPath.BUDGET,
+        path: appPath.INCOME,
         element: <BudgetsPage />,
       },
       {

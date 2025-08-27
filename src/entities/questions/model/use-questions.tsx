@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db, firestoreCollection } from '@/shared/config/firebase.ts';
 import type { QuestionsState } from '@/entities/questions/model/questions-reducer.ts';
 import { handleFirebaseError } from '@/shared/utils/firebase.ts';
@@ -23,7 +23,9 @@ export const useQuestions = (user: User | null) => {
         questionsData.goal &&
         questionsData.goalPrice &&
         questionsData.goalCurrency &&
-        questionsData.salaryPrice;
+        (questionsData.goalDuration.days > 0 ||
+          questionsData.goalDuration.months > 0 ||
+          questionsData.goalDuration.years > 0);
 
       if (!isComplete) {
         return {
@@ -33,10 +35,16 @@ export const useQuestions = (user: User | null) => {
       }
 
       setIsLoading(true);
-      try {
-        const questionsRef = doc(db, firestoreCollection.QUESTIONS, user.uid);
 
-        await setDoc(questionsRef, {
+      try {
+        const goalsRef = collection(
+          db,
+          firestoreCollection.USERS,
+          user.uid,
+          firestoreCollection.GOALS
+        );
+
+        await addDoc(goalsRef, {
           ...questionsData,
           userId: user.uid,
           createdAt: serverTimestamp(),
@@ -63,7 +71,9 @@ export const useQuestions = (user: User | null) => {
         questionsData.goal &&
           questionsData.goalPrice &&
           questionsData.goalCurrency &&
-          questionsData.salaryPrice
+          (questionsData.goalDuration.days > 0 ||
+            questionsData.goalDuration.months > 0 ||
+            questionsData.goalDuration.years > 0)
       );
     },
     []

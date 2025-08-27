@@ -5,8 +5,11 @@ export type QuestionsState = {
   goal: string;
   goalPrice: string;
   goalCurrency: string;
-  salaryPrice: string;
-  salaryCurrency: string;
+  goalDuration: {
+    days: number;
+    months: number;
+    years: number;
+  };
 };
 
 export type QuestionsAction =
@@ -14,8 +17,10 @@ export type QuestionsAction =
   | { type: 'SET_GOAL'; goal: string }
   | { type: 'SET_GOAL_PRICE'; goalPrice: string }
   | { type: 'SET_GOAL_CURRENCY'; currency: string }
-  | { type: 'SET_SALARY'; salary: string }
-  | { type: 'SET_SALARY_CURRENCY'; currency: string }
+  | {
+      type: 'SET_GOAL_DURATION';
+      duration: { days: number; months: number; years: number };
+    }
   | { type: 'RESET' };
 
 export const initialQuestionsState: QuestionsState = {
@@ -23,8 +28,11 @@ export const initialQuestionsState: QuestionsState = {
   goal: '',
   goalPrice: '',
   goalCurrency: 'USD',
-  salaryPrice: '',
-  salaryCurrency: 'USD',
+  goalDuration: {
+    days: 0,
+    months: 0,
+    years: 0,
+  },
 };
 
 export function questionsReducer(
@@ -46,10 +54,8 @@ export function questionsReducer(
       };
     case 'SET_GOAL_CURRENCY':
       return { ...state, goalCurrency: action.currency };
-    case 'SET_SALARY_CURRENCY':
-      return { ...state, salaryCurrency: action.currency };
-    case 'SET_SALARY':
-      return { ...state, salaryPrice: sanitizeNumeric(action.salary) };
+    case 'SET_GOAL_DURATION':
+      return { ...state, goalDuration: action.duration };
     case 'RESET':
       return { ...initialQuestionsState };
     default:

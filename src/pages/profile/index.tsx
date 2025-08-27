@@ -26,6 +26,7 @@ export function ProfilePage() {
     if (userAdditional?.firstName && userAdditional?.lastName) {
       return `${userAdditional.firstName[0]}${userAdditional.lastName[0]}`.toUpperCase();
     }
+
     return user?.displayName?.slice(0, 2).toUpperCase() || 'U';
   };
 
