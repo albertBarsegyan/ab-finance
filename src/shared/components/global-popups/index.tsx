@@ -2,8 +2,9 @@
 
 import { useAlert } from '@/shared/hooks/alert.tsx';
 import { CustomAlert } from '@/shared/components/custom/alert';
+import { GlobalModals } from '@/shared/components/global-modals';
 
-export function GlobalPopup() {
+export function GlobalPopups() {
   const { message, clearAlert, variant } = useAlert();
 
   return (
@@ -16,6 +17,7 @@ export function GlobalPopup() {
           onTimeout={clearAlert}
         />
       )}
+      <GlobalModals />
     </>
   );
 }

@@ -21,6 +21,7 @@ import {
 } from '@/shared/components/ui/dialog';
 import { appPath } from '@/shared/constants/app-path.ts';
 import { AbFinanceLogo } from '@/shared/components/icons/logo.tsx';
+import { UserGoalsDropdown } from '@/shared/components/custom/user-goals-dropdown.tsx';
 
 const navigation = [
   { name: 'Overview', href: appPath.MAIN_PATH, icon: Home },
@@ -54,7 +55,10 @@ export function MainLayout() {
         />
         <div className="fixed inset-y-0 left-0 flex w-full lg:w-64 flex-col bg-white">
           <div className="flex h-16 items-center justify-between px-4">
-            <h1 className="text-xl font-bold text-gray-900">abFinance</h1>
+            <h1 className="text-xl font-bold text-gray-900">
+              <AbFinanceLogo />
+            </h1>
+
             <Button
               variant="ghost"
               size="sm"
@@ -63,13 +67,16 @@ export function MainLayout() {
               <X className="h-6 w-6" />
             </Button>
           </div>
+          <div className="px-4 pb-4">
+            <UserGoalsDropdown />
+          </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map(item => {
               const isActive = location.pathname === item.href;
               return (
-                <Link
+                <a
                   key={item.name}
-                  to={item.href}
+                  href={item.href}
                   className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                     isActive
                       ? 'bg-green-100 text-green-900'
@@ -79,7 +86,7 @@ export function MainLayout() {
                 >
                   <item.icon className="mr-3 h-5 w-5" />
                   {item.name}
-                </Link>
+                </a>
               );
             })}
           </nav>
@@ -100,9 +107,12 @@ export function MainLayout() {
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
           <div className="flex items-center h-16 px-4">
-            <h1 className="text-xl font-bold text-gray-900">
+            <a href={appPath.MAIN_PATH} rel="noreferrer">
               <AbFinanceLogo />
-            </h1>
+            </a>
+          </div>
+          <div className="px-4 pb-4">
+            <UserGoalsDropdown />
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map(item => {

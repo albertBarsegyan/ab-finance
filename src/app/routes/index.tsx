@@ -6,7 +6,7 @@ import { LoaderWrapper } from '@/shared/components/custom/loader';
 import QuestionsPage from '@/pages/questions';
 
 export function AppRouter() {
-  const { user, initializing, userAdditional } = useAuth();
+  const { initializing, userAdditional } = useAuth();
 
   if (initializing)
     return (
@@ -20,5 +20,9 @@ export function AppRouter() {
 
   if (userAdditional?.isFirstTime) return <QuestionsPage />;
 
-  return <RouterProvider router={user ? authenticatedRoutes : guestRoutes} />;
+  return (
+    <RouterProvider
+      router={userAdditional ? authenticatedRoutes : guestRoutes}
+    />
+  );
 }

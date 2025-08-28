@@ -1,0 +1,190 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { Badge } from '@/shared/components/ui/badge';
+import { useMemo } from 'react';
+import { useModal } from '@/shared/hooks/modal';
+import { useAuth } from '@/shared/hooks/auth';
+import { useIncomes } from '@/entities/incomes/model/use-incomes';
+import {
+  Car,
+  DollarSign,
+  Heart,
+  Home,
+  Plane,
+  Plus,
+  Settings,
+} from 'lucide-react';
+
+// Helper function to get icon and color based on income category
+const getIncomeIconAndColor = (category: string) => {
+  const categoryLower = category.toLowerCase();
+  if (categoryLower.includes('salary') || categoryLower.includes('job'))
+    return { icon: DollarSign, color: 'bg-green-500' };
+  if (categoryLower.includes('freelance') || categoryLower.includes('project'))
+    return { icon: Car, color: 'bg-blue-500' };
+  if (
+    categoryLower.includes('investment') ||
+    categoryLower.includes('dividend')
+  )
+    return { icon: Home, color: 'bg-purple-500' };
+  if (categoryLower.includes('rental') || categoryLower.includes('property'))
+    return { icon: Heart, color: 'bg-orange-500' };
+  if (categoryLower.includes('business') || categoryLower.includes('side'))
+    return { icon: Plane, color: 'bg-indigo-500' };
+  return { icon: DollarSign, color: 'bg-gray-500' };
+};
+
+export function IncomePage() {
+  const { openModal } = useModal();
+  const { user } = useAuth();
+  const { incomes, loading } = useIncomes(user?.uid);
+
+  // Transform incomes data for display
+  const displayIncomes = useMemo(() => {
+    return incomes.map(income => {
+      const { icon, color } = getIncomeIconAndColor(
+        (income.note as string) || 'Income'
+      );
+      const amount = (income.amount as number) || 0;
+
+      return {
+        id: income.id,
+        name: (income.note as string) || 'Income',
+        icon,
+        amount,
+        color,
+        status: 'received',
+        date: income.createdAt
+          ? new Date(income.createdAt as string).toISOString().split('T')[0]
+          : new Date().toISOString().split('T')[0],
+      };
+    });
+  }, [incomes]);
+
+  const totalIncome = displayIncomes.reduce(
+    (sum, income) => sum + income.amount,
+    0
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Income</h1>
+          <p className="text-muted-foreground">
+            Track your Income and stay within your budget limits.
+          </p>
+        </div>
+        <Button onClick={() => openModal('add-income')}>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Income
+        </Button>
+      </div>
+
+      {/* Budget Overview */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${totalIncome.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">Total Income</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Budget Progress */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Overall Budget Progress</CardTitle>
+          <CardDescription>
+            Your spending progress across all categories
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {loading ? (
+              <div className="text-center py-4">
+                <p className="text-muted-foreground">Loading income data...</p>
+              </div>
+            ) : displayIncomes.length === 0 ? (
+              <div className="text-center py-4">
+                <p className="text-muted-foreground">No income data found</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {displayIncomes.map(income => {
+                  const IconComponent = income.icon;
+                  return (
+                    <div
+                      key={income.id}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center ${income.color}`}
+                        >
+                          <IconComponent className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{income.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {income.date}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-green-600">
+                          ${income.amount.toFixed(2)}
+                        </p>
+                        <Badge variant="default" className="text-xs">
+                          {income.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+          <CardDescription>Manage your budgets efficiently</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
+            <Button
+              variant="outline"
+              className="h-auto p-4 flex-col"
+              onClick={() => openModal('add-outcome')}
+            >
+              <Plus className="h-6 w-6 mb-2" />
+              <span>Create New Budget</span>
+            </Button>
+            <Button variant="outline" className="h-auto p-4 flex-col">
+              <Settings className="h-6 w-6 mb-2" />
+              <span>Budget Settings</span>
+            </Button>
+            <Button variant="outline" className="h-auto p-4 flex-col">
+              <DollarSign className="h-6 w-6 mb-2" />
+              <span>Adjust Budgets</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

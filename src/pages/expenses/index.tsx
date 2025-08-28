@@ -8,76 +8,30 @@ import {
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Badge } from '@/shared/components/ui/badge';
+import { useMemo } from 'react';
+import { useModal } from '@/shared/hooks/modal';
+import { useAuth } from '@/shared/hooks/auth';
+import { useIncomes } from '@/entities/incomes/model/use-incomes';
+import { useOutcomes } from '@/entities/outcomes/model/use-outcomes';
 import {
-  Car,
   CreditCard,
-  Download,
   Filter,
-  Home,
   Plus,
   Search,
-  ShoppingBag,
   TrendingDown,
   TrendingUp,
-  Utensils,
 } from 'lucide-react';
 
-const transactions = [
-  {
-    id: 1,
-    description: 'Grocery Store',
-    amount: -85.5,
-    category: 'Food & Dining',
-    date: '2024-01-15',
-    type: 'expense',
-    icon: ShoppingBag,
-  },
-  {
-    id: 2,
-    description: 'Salary Deposit',
-    amount: 3500.0,
-    category: 'Income',
-    date: '2024-01-14',
-    type: 'income',
-    icon: TrendingUp,
-  },
-  {
-    id: 3,
-    description: 'Gas Station',
-    amount: -45.0,
-    category: 'Transportation',
-    date: '2024-01-13',
-    type: 'expense',
-    icon: Car,
-  },
-  {
-    id: 4,
-    description: 'Freelance Payment',
-    amount: 250.0,
-    category: 'Income',
-    date: '2024-01-12',
-    type: 'income',
-    icon: TrendingUp,
-  },
-  {
-    id: 5,
-    description: 'Restaurant',
-    amount: -65.0,
-    category: 'Food & Dining',
-    date: '2024-01-11',
-    type: 'expense',
-    icon: Utensils,
-  },
-  {
-    id: 6,
-    description: 'Rent Payment',
-    amount: -1200.0,
-    category: 'Housing',
-    date: '2024-01-10',
-    type: 'expense',
-    icon: Home,
-  },
-];
+// Type for transaction display
+type TransactionDisplay = {
+  id: string;
+  description: string;
+  amount: number;
+  category: string;
+  date: string;
+  type: 'income' | 'expense';
+  icon: any;
+};
 
 const categories = [
   'All Categories',
@@ -91,6 +45,44 @@ const categories = [
 ];
 
 export function ExpensesPage() {
+  const { openModal } = useModal();
+  const { user } = useAuth();
+  const { incomes, loading: incomesLoading } = useIncomes(user?.uid);
+  const { outcomes, loading: outcomesLoading } = useOutcomes(user?.uid);
+
+  // Combine incomes and outcomes into transactions
+  const transactions = useMemo((): TransactionDisplay[] => {
+    const incomeTransactions: TransactionDisplay[] = incomes.map(income => ({
+      id: income.id,
+      description: (income.note as string) || 'Income',
+      amount: (income.amount as number) || 0,
+      category: 'Income',
+      date: income.createdAt
+        ? new Date(income.createdAt as number).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0],
+      type: 'income',
+      icon: TrendingUp,
+    }));
+
+    const outcomeTransactions: TransactionDisplay[] = outcomes.map(outcome => ({
+      id: outcome.id,
+      description: (outcome.note as string) || 'Expense',
+      amount: -((outcome.amount as number) || 0), // Negative for expenses
+      category: 'Expense',
+      date: outcome.createdAt
+        ? new Date(outcome.createdAt as number).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0],
+      type: 'expense',
+      icon: TrendingDown,
+    }));
+
+    return [...incomeTransactions, ...outcomeTransactions].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+  }, [incomes, outcomes]);
+
+  const loading = incomesLoading || outcomesLoading;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -101,13 +93,9 @@ export function ExpensesPage() {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Button>
+          <Button onClick={() => openModal('add-outcome')}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Transaction
+            Add Expense
           </Button>
         </div>
       </div>
@@ -145,8 +133,16 @@ export function ExpensesPage() {
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">$3,750.00</div>
-            <p className="text-xs text-muted-foreground">This month</p>
+            <div className="text-2xl font-bold text-green-600">
+              $
+              {incomes
+                .reduce(
+                  (sum, income) => sum + ((income.amount as number) || 0),
+                  0
+                )
+                .toFixed(2)}
+            </div>
+            <p className="text-xs text-muted-foreground">Total</p>
           </CardContent>
         </Card>
 
@@ -158,8 +154,16 @@ export function ExpensesPage() {
             <TrendingDown className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">$1,395.50</div>
-            <p className="text-xs text-muted-foreground">This month</p>
+            <div className="text-2xl font-bold text-red-600">
+              $
+              {outcomes
+                .reduce(
+                  (sum, outcome) => sum + ((outcome.amount as number) || 0),
+                  0
+                )
+                .toFixed(2)}
+            </div>
+            <p className="text-xs text-muted-foreground">Total</p>
           </CardContent>
         </Card>
 
@@ -169,72 +173,97 @@ export function ExpensesPage() {
             <CreditCard className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">$2,354.50</div>
-            <p className="text-xs text-muted-foreground">This month</p>
+            <div className="text-2xl font-bold text-blue-600">
+              $
+              {(
+                incomes.reduce(
+                  (sum, income) => sum + ((income.amount as number) || 0),
+                  0
+                ) -
+                outcomes.reduce(
+                  (sum, outcome) => sum + ((outcome.amount as number) || 0),
+                  0
+                )
+              ).toFixed(2)}
+            </div>
+            <p className="text-xs text-muted-foreground">Total</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Transactions List */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Transactions</CardTitle>
-          <CardDescription>Your latest financial activity</CardDescription>
+          <CardTitle>Expenses</CardTitle>
+          <CardDescription>Your latest expenses</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {transactions.map(transaction => {
-              const IconComponent = transaction.icon;
-              return (
-                <div
-                  key={transaction.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        transaction.type === 'income'
-                          ? 'bg-green-100'
-                          : 'bg-red-100'
-                      }`}
-                    >
-                      <IconComponent
-                        className={`h-5 w-5 ${
+            {loading ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Loading transactions...</p>
+              </div>
+            ) : transactions.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No transactions found</p>
+              </div>
+            ) : (
+              transactions.map((transaction: TransactionDisplay) => {
+                const IconComponent = transaction.icon;
+                return (
+                  <div
+                    key={transaction.id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          transaction.type === 'income'
+                            ? 'bg-green-100'
+                            : 'bg-red-100'
+                        }`}
+                      >
+                        <IconComponent
+                          className={`h-5 w-5 ${
+                            transaction.type === 'income'
+                              ? 'text-green-600'
+                              : 'text-red-600'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">
+                          {transaction.description}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          {transaction.category} • {transaction.date}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge
+                        variant={
+                          transaction.type === 'income'
+                            ? 'default'
+                            : 'secondary'
+                        }
+                      >
+                        {transaction.type === 'income' ? 'Income' : 'Expense'}
+                      </Badge>
+                      <span
+                        className={`font-medium ${
                           transaction.type === 'income'
                             ? 'text-green-600'
                             : 'text-red-600'
                         }`}
-                      />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">{transaction.description}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {transaction.category} • {transaction.date}
-                      </p>
+                      >
+                        {transaction.type === 'income' ? '+' : ''}$
+                        {Math.abs(transaction.amount).toFixed(2)}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge
-                      variant={
-                        transaction.type === 'income' ? 'default' : 'secondary'
-                      }
-                    >
-                      {transaction.type === 'income' ? 'Income' : 'Expense'}
-                    </Badge>
-                    <span
-                      className={`font-medium ${
-                        transaction.type === 'income'
-                          ? 'text-green-600'
-                          : 'text-red-600'
-                      }`}
-                    >
-                      {transaction.type === 'income' ? '+' : ''}$
-                      {Math.abs(transaction.amount).toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </CardContent>
       </Card>

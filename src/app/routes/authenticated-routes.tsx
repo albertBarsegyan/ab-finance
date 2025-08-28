@@ -4,7 +4,7 @@ import { MainLayout } from '@/shared/components/layouts/main-layout.tsx';
 import { DashboardPage } from '@/pages/dashboard';
 import { ProfilePage } from '@/pages/profile';
 import { ExpensesPage } from '@/pages/expenses';
-import { BudgetsPage } from '@/pages/budgets';
+import { IncomePage } from '@/pages/income';
 import { GoalsPage } from '@/pages/goals';
 
 export const authenticatedRoutes = createBrowserRouter([
@@ -26,7 +26,7 @@ export const authenticatedRoutes = createBrowserRouter([
       },
       {
         path: appPath.INCOME,
-        element: <BudgetsPage />,
+        element: <IncomePage />,
       },
       {
         path: appPath.GOALS,

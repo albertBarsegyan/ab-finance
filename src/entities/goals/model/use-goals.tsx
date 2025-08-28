@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import {
+  addDoc,
   collection,
   FirestoreError,
   onSnapshot,
-  orderBy,
   query,
 } from 'firebase/firestore';
 import { db, firestoreCollection } from '@/shared/config/firebase.ts';
@@ -23,6 +23,9 @@ interface UseUserGoalsResult {
   goals: Goal[];
   loading: boolean;
   error: FirestoreError | null;
+  addGoal: (
+    goalData: Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>
+  ) => Promise<{ success: boolean; error?: string }>;
 }
 
 export function useGoals(userId: string | undefined): UseUserGoalsResult {
@@ -33,35 +36,78 @@ export function useGoals(userId: string | undefined): UseUserGoalsResult {
   useEffect(() => {
     if (!userId) return;
 
-    const goalsRef = collection(
-      db,
-      firestoreCollection.USERS,
-      userId,
-      firestoreCollection.GOALS
-    );
+    try {
+      const goalsRef = collection(
+        db,
+        firestoreCollection.USERS,
+        userId,
+        firestoreCollection.GOALS
+      );
 
-    const q = query(goalsRef, orderBy('createdAt', 'desc'));
+      // Use simple query without orderBy to avoid index issues
+      const q = query(goalsRef);
 
-    const unsubscribe = onSnapshot(
-      q,
-      snapshot => {
-        const fetchedGoals = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Goal[];
+      const unsubscribe = onSnapshot(
+        q,
+        snapshot => {
+          const fetchedGoals = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Goal[];
 
-        setGoals(fetchedGoals);
-        setLoading(false);
-      },
-      err => {
-        console.error('Error fetching goals:', err);
-        setError(err);
-        setLoading(false);
-      }
-    );
+          // Sort manually by createdAt
+          fetchedGoals.sort((a, b) => {
+            const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return bTime - aTime;
+          });
 
-    return () => unsubscribe();
+          setGoals(fetchedGoals);
+          setLoading(false);
+        },
+        err => {
+          console.error('Error fetching goals:', err);
+          setError(err);
+          setLoading(false);
+        }
+      );
+
+      return () => unsubscribe();
+    } catch (error) {
+      console.error('Error setting up goals query:', error);
+      setError(error as FirestoreError);
+      setLoading(false);
+    }
   }, [userId]);
 
-  return { goals, loading, error };
+  const addGoal = async (
+    goalData: Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+      const goalsRef = collection(
+        db,
+        firestoreCollection.USERS,
+        userId,
+        firestoreCollection.GOALS
+      );
+
+      const newGoal = {
+        ...goalData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      await addDoc(goalsRef, newGoal);
+      return { success: true };
+    } catch (error) {
+      console.error('Error adding goal:', error);
+      return { success: false, error: 'Failed to add goal' };
+    }
+  };
+
+  return { goals, loading, error, addGoal };
 }
