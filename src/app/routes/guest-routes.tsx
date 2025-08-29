@@ -1,26 +1,76 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { GuestLayout } from '@/shared/components/layouts/guest-layout.tsx';
-import { HomePage } from '@/pages/home';
-import { LoginPage } from '@/pages/auth/login.tsx';
-import { RegisterPage } from '@/pages/auth/register.tsx';
+import { lazy, Suspense } from 'react';
+import { LoaderWrapper } from '@/shared/components/custom/loader';
 import { appPath } from '@/shared/constants/app-path.ts';
+
+const GuestLayout = lazy(() =>
+  import('@/shared/components/layouts/guest-layout.tsx').then(m => ({
+    default: m.GuestLayout,
+  }))
+);
+const HomePage = lazy(() =>
+  import('@/pages/home').then(m => ({ default: m.HomePage }))
+);
+const LoginPage = lazy(() =>
+  import('@/pages/auth/login.tsx').then(m => ({ default: m.LoginPage }))
+);
+const RegisterPage = lazy(() =>
+  import('@/pages/auth/register.tsx').then(m => ({ default: m.RegisterPage }))
+);
 
 export const guestRoutes = createBrowserRouter([
   {
     path: appPath.MAIN_PATH,
-    element: <GuestLayout />,
+    element: (
+      <Suspense
+        fallback={
+          <LoaderWrapper
+            message="Loading..."
+            overlay
+            variant="fullscreen"
+            loading
+          />
+        }
+      >
+        <GuestLayout />
+      </Suspense>
+    ),
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: (
+          <Suspense
+            fallback={
+              <LoaderWrapper message="Loading home..." overlay loading />
+            }
+          >
+            <HomePage />
+          </Suspense>
+        ),
       },
       {
         path: appPath.LOGIN,
-        element: <LoginPage />,
+        element: (
+          <Suspense
+            fallback={
+              <LoaderWrapper message="Loading login..." overlay loading />
+            }
+          >
+            <LoginPage />
+          </Suspense>
+        ),
       },
       {
         path: appPath.REGISTER,
-        element: <RegisterPage />,
+        element: (
+          <Suspense
+            fallback={
+              <LoaderWrapper message="Loading register..." overlay loading />
+            }
+          >
+            <RegisterPage />
+          </Suspense>
+        ),
       },
     ],
   },

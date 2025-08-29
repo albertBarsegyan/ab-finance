@@ -22,7 +22,7 @@ import { useAuth } from '@/shared/hooks/auth.tsx';
 import { useAlert } from '@/shared/hooks/alert.tsx';
 
 export function LoginForm() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const { setAlert } = useAlert();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,6 +50,13 @@ export function LoginForm() {
 
     if (messageData) setAlert(messageData);
 
+    setIsLoading(false);
+  };
+
+  const onGoogleSignIn = async () => {
+    setIsLoading(true);
+    const messageData = await signInWithGoogle?.();
+    if (messageData) setAlert(messageData);
     setIsLoading(false);
   };
 
@@ -137,6 +144,25 @@ export function LoginForm() {
             disabled={isLoading}
           >
             {isLoading ? 'Signing in...' : 'Sign in'}
+          </Button>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={onGoogleSignIn}
+            disabled={isLoading}
+          >
+            Continue with Google
           </Button>
         </form>
 

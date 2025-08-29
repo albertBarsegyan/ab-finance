@@ -28,7 +28,7 @@ export function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { signUp } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
 
   const {
     register,
@@ -53,6 +53,13 @@ export function RegisterForm() {
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     const messageData = await signUp?.(data);
+    if (messageData) setAlert(messageData);
+    setIsLoading(false);
+  };
+
+  const onGoogleSignUp = async () => {
+    setIsLoading(true);
+    const messageData = await signInWithGoogle?.();
     if (messageData) setAlert(messageData);
     setIsLoading(false);
   };
@@ -217,6 +224,25 @@ export function RegisterForm() {
             disabled={isLoading}
           >
             {isLoading ? 'Creating Account...' : 'Create Account'}
+          </Button>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={onGoogleSignUp}
+            disabled={isLoading}
+          >
+            Continue with Google
           </Button>
         </form>
 

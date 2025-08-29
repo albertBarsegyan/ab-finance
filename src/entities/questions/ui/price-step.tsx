@@ -54,8 +54,6 @@ export function PriceStep({
               id="currency"
               value={currency}
               onChange={e => {
-                const value = e.target.value;
-                console.log({ value });
                 setCurrency(e.target.value);
               }}
               className="mt-1 border rounded-md px-3 py-2 w-full bg-background"

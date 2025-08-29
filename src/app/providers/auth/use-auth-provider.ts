@@ -7,8 +7,10 @@ import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db, firestoreCollection } from '@/shared/config/firebase';
 import type { SignUpProps } from './index';
 import { handleFirebaseError } from '@/shared/utils/firebase.ts';
@@ -131,6 +133,43 @@ export function useAuthProviderContent() {
     }
   };
 
+  const signInWithGoogle = async (): Promise<AlertState> => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+
+      const signedInUser = result.user;
+      setUser(signedInUser);
+
+      const userDocRef = doc(db, firestoreCollection.USERS, signedInUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (!userDocSnap.exists()) {
+        const displayName = signedInUser.displayName || '';
+        const [firstName = '', lastName = ''] = displayName.split(' ');
+        const userData = {
+          firstName,
+          lastName,
+          email: signedInUser.email || '',
+          isFirstTime: true,
+          createdAt: serverTimestamp(),
+        };
+
+        await setDoc(userDocRef, userData);
+        const snapshot = await getDoc(userDocRef);
+        if (snapshot.exists())
+          setUserAdditional(snapshot.data() as UserAdditional);
+      } else {
+        const data = userDocSnap.data() as UserAdditional;
+        setUserAdditional(data);
+      }
+
+      return { message: 'Signed in with Google!', variant: 'success' };
+    } catch (error: unknown) {
+      return handleFirebaseError(error);
+    }
+  };
+
   const signOut = async (): Promise<AlertState> => {
     try {
       await firebaseSignOut(auth);
@@ -158,6 +197,27 @@ export function useAuthProviderContent() {
     }
   };
 
+  const updateUserProfile = async (
+    data: Partial<UserAdditional>
+  ): Promise<AlertState> => {
+    try {
+      if (!user?.uid) {
+        return { message: 'Not authenticated.', variant: 'destructive' };
+      }
+
+      const userDocRef = doc(db, firestoreCollection.USERS, user.uid);
+      await updateDoc(userDocRef, {
+        ...data,
+        // Do not allow changing email here if you don’t also update auth
+      });
+
+      await fetchUserAdditional(user.uid);
+      return { message: 'Profile updated successfully!', variant: 'success' };
+    } catch (error: unknown) {
+      return handleFirebaseError(error);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async userData => {
       setUser(userData);
@@ -177,7 +237,9 @@ export function useAuthProviderContent() {
     initializing,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
     fetchUserDocument: fetchUserAdditional,
+    updateUserProfile,
   };
 }

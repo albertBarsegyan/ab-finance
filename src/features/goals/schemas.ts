@@ -16,3 +16,6 @@ export const addGoalSchema = z.object({
 });
 
 export type AddGoalFormData = z.infer<typeof addGoalSchema>;
+
+export const editGoalSchema = addGoalSchema;
+export type EditGoalFormData = z.infer<typeof editGoalSchema>;

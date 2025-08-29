@@ -30,7 +30,7 @@ export function AddIncomeModal({
   const { setAlert } = useAlert();
   const { selectedGoalId } = useGoalSelection();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
+  console.log({ selectedGoalId });
   const { addIncome } = useIncomes(user?.uid, selectedGoalId || undefined);
 
   const {
@@ -48,9 +48,8 @@ export function AddIncomeModal({
   });
 
   const onSubmit = async (data: AddIncomeFormData) => {
-    console.log('selectedGoalId', selectedGoalId);
     if (!user?.uid || !selectedGoalId) return;
-    console.log('here');
+
     setIsSubmitting(true);
 
     const result = await addIncome({

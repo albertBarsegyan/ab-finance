@@ -17,8 +17,8 @@ export type Outcome = {
   goalId: string;
   createdAt?: unknown;
   updatedAt?: unknown;
-  // Other optional fields like amount, note, date can be added by caller
-  [key: string]: unknown;
+  note: string;
+  amount: string;
 };
 
 export type NewOutcome = Omit<Outcome, 'id' | 'createdAt' | 'updatedAt'>;
@@ -29,15 +29,14 @@ export function useOutcomes(userId: string | undefined, goalId?: string) {
   const [error, setError] = useState<FirestoreError | null>(null);
 
   const baseRef = useMemo(() => {
-    if (!userId) return null;
-    return collection(db, firestoreCollection.OUTCOMES, userId);
-  }, [userId]);
+    return collection(db, firestoreCollection.OUTCOMES);
+  }, []);
 
   useEffect(() => {
     if (!userId || !baseRef) return;
 
     try {
-      const constraints = [];
+      const constraints = [where('userId', '==', userId)];
       if (goalId) constraints.push(where('goalId', '==', goalId));
 
       // Use simple query without orderBy to avoid index issues

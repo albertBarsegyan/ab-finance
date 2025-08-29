@@ -11,15 +11,8 @@ import { useMemo } from 'react';
 import { useModal } from '@/shared/hooks/modal';
 import { useAuth } from '@/shared/hooks/auth';
 import { useIncomes } from '@/entities/incomes/model/use-incomes';
-import {
-  Car,
-  DollarSign,
-  Heart,
-  Home,
-  Plane,
-  Plus,
-  Settings,
-} from 'lucide-react';
+import { useGoalSelection } from '@/app/providers/goal';
+import { Car, DollarSign, Heart, Home, Plane, Plus } from 'lucide-react';
 
 // Helper function to get icon and color based on income category
 const getIncomeIconAndColor = (category: string) => {
@@ -43,7 +36,11 @@ const getIncomeIconAndColor = (category: string) => {
 export function IncomePage() {
   const { openModal } = useModal();
   const { user } = useAuth();
-  const { incomes, loading } = useIncomes(user?.uid);
+  const { selectedGoalId } = useGoalSelection();
+  const { incomes, loading } = useIncomes(
+    user?.uid,
+    selectedGoalId || undefined
+  );
 
   // Transform incomes data for display
   const displayIncomes = useMemo(() => {
@@ -154,34 +151,6 @@ export function IncomePage() {
                 })}
               </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Manage your budgets efficiently</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <Button
-              variant="outline"
-              className="h-auto p-4 flex-col"
-              onClick={() => openModal('add-outcome')}
-            >
-              <Plus className="h-6 w-6 mb-2" />
-              <span>Create New Budget</span>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 flex-col">
-              <Settings className="h-6 w-6 mb-2" />
-              <span>Budget Settings</span>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 flex-col">
-              <DollarSign className="h-6 w-6 mb-2" />
-              <span>Adjust Budgets</span>
-            </Button>
           </div>
         </CardContent>
       </Card>

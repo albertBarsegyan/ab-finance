@@ -1,3 +1,9 @@
+import { useMemo } from 'react';
+import { useAuth } from '@/shared/hooks/auth';
+import { useGoalSelection } from '@/app/providers/goal';
+import { useIncomes } from '@/entities/incomes/model/use-incomes';
+import { useOutcomes } from '@/entities/outcomes/model/use-outcomes';
+
 import {
   Card,
   CardContent,
@@ -6,235 +12,223 @@ import {
 } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Progress } from '@/shared/components/ui/progress';
+import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
+
+// Recharts
 import {
-  AlertTriangle,
-  BarChart3,
-  CheckCircle,
-  Info,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
   PieChart,
-} from 'lucide-react';
-
-// Sample data for Net Worth chart
-const netWorthData: Array<{ month: string; value: number }> = [
-  { month: 'Sep 25', value: 1400000 },
-  { month: 'Nov 25', value: 1500000 },
-  { month: 'Jan 25', value: 1600000 },
-  { month: 'Mar 25', value: 1650000 },
-  { month: 'May 25', value: 1700000 },
-  { month: 'Jul 25', value: 1750000 },
-];
-
-// Sample data for Current Holdings chart
-const holdingsData: Array<{ name: string; value: number; color: string }> = [
-  { name: 'Stocks', value: 800000, color: '#3B82F6' },
-  { name: 'Real Estate', value: 600000, color: '#8B5CF6' },
-  { name: 'Bonds', value: 400000, color: '#1E40AF' },
-  { name: 'Cash', value: 300000, color: '#10B981' },
-  { name: 'Commodities', value: 200000, color: '#F59E0B' },
-  { name: 'Other', value: 150000, color: '#6B7280' },
-  { name: 'Crypto', value: 107881, color: '#9CA3AF' },
-];
-
-// Financial metrics data
-const financialMetrics: Array<{
-  name: string;
-  currentValue: number;
-  unit: string;
-  goalProgress: number;
-  goalValue: string;
-  progressColor: string;
-  overGoal?: boolean;
-  overGoalValue?: number;
-  status?: string;
-}> = [
-  {
-    name: 'INCOME',
-    currentValue: 833.3,
-    unit: '/month',
-    goalProgress: 19,
-    goalValue: '4.5K',
-    progressColor: 'bg-blue-500',
-  },
-  {
-    name: 'SPENDINGS',
-    currentValue: 750.0,
-    unit: '/month',
-    goalProgress: 12,
-    goalValue: '6.5K',
-    progressColor: 'bg-orange-500',
-  },
-  {
-    name: 'SAVINGS',
-    currentValue: 83.3,
-    unit: '/month',
-    goalProgress: 6,
-    goalValue: '1.4K',
-    progressColor: 'bg-yellow-500',
-  },
-  {
-    name: 'INVESTMENT RETURN',
-    currentValue: 0.0,
-    unit: '%',
-    goalProgress: 0,
-    goalValue: '2.0%',
-    progressColor: 'bg-gray-300',
-  },
-  {
-    name: 'GROWTH RATE',
-    currentValue: 0.0,
-    unit: '%',
-    goalProgress: 0,
-    goalValue: '7.0%',
-    progressColor: 'bg-gray-300',
-  },
-  {
-    name: 'DEBT-INCOME RATIO',
-    currentValue: 21,
-    unit: '%',
-    goalProgress: 105,
-    goalValue: '20%',
-    progressColor: 'bg-blue-500',
-    overGoal: true,
-    overGoalValue: 5,
-  },
-  {
-    name: 'CASH ON HAND',
-    currentValue: 7.4,
-    unit: 'K',
-    goalProgress: 44,
-    goalValue: '17.0K',
-    progressColor: 'bg-blue-500',
-  },
-  {
-    name: 'ACCESSIBLE CASH',
-    currentValue: 739.0,
-    unit: 'K',
-    goalProgress: 86,
-    goalValue: '854.4K',
-    progressColor: 'bg-blue-500',
-  },
-  {
-    name: 'RUNAWAY',
-    currentValue: 904,
-    unit: 'months',
-    goalProgress: 377,
-    goalValue: '240 months',
-    progressColor: 'bg-green-500',
-    status: 'success',
-  },
-];
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 export function DashboardPage() {
+  const { user } = useAuth();
+  const { selectedGoal } = useGoalSelection();
+
+  const { incomes, loading: incomesLoading } = useIncomes(
+    user?.uid,
+    selectedGoal?.id || undefined
+  );
+  const { outcomes, loading: outcomesLoading } = useOutcomes(
+    user?.uid,
+    selectedGoal?.id || undefined
+  );
+
+  // Aggregate monthly data for charts (last 6 months)
+  const { monthlySeries, totalIncome, totalOutcome } = useMemo(() => {
+    const byMonth = new Map<string, { income: number; outcome: number }>();
+
+    const monthKey = (iso?: unknown) => {
+      if (!iso || typeof iso !== 'string') return 'Unknown';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return 'Unknown';
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    };
+
+    for (const inc of incomes) {
+      const key = monthKey(inc.createdAt);
+      const prev = byMonth.get(key) || { income: 0, outcome: 0 };
+      byMonth.set(key, { ...prev, income: prev.income + (inc.amount || 0) });
+    }
+
+    for (const out of outcomes) {
+      const key = monthKey(out.createdAt);
+      const prev = byMonth.get(key) || { income: 0, outcome: 0 };
+      const amount =
+        typeof out.amount === 'string'
+          ? parseFloat(out.amount)
+          : Number(out.amount || 0);
+      byMonth.set(key, { ...prev, outcome: prev.outcome + (amount || 0) });
+    }
+
+    const sortedKeys = Array.from(byMonth.keys()).sort();
+    const lastSixKeys = sortedKeys.slice(-6);
+    const series = lastSixKeys.map(k => ({
+      month: k,
+      income: byMonth.get(k)?.income || 0,
+      spendings: byMonth.get(k)?.outcome || 0,
+      savings: (byMonth.get(k)?.income || 0) - (byMonth.get(k)?.outcome || 0),
+    }));
+
+    const totals = series.reduce(
+      (acc, cur) => {
+        acc.totalIncome += cur.income;
+        acc.totalOutcome += cur.spendings;
+        return acc;
+      },
+      { totalIncome: 0, totalOutcome: 0 }
+    );
+
+    return { monthlySeries: series, ...totals };
+  }, [incomes, outcomes]);
+
+  const savingsTotal = Math.max(totalIncome - totalOutcome, 0);
+
+  const holdingsData = useMemo(
+    () => [
+      { name: 'Savings', value: savingsTotal, color: '#10B981' },
+      { name: 'Spendings', value: totalOutcome, color: '#F59E0B' },
+      { name: 'Income', value: totalIncome, color: '#3B82F6' },
+    ],
+    [savingsTotal, totalOutcome, totalIncome]
+  );
+
+  const loading = incomesLoading || outcomesLoading;
+
+  const financialMetrics = useMemo(
+    () => [
+      {
+        name: 'INCOME',
+        currentValue: totalIncome,
+        unit: selectedGoal ? '' : '',
+        goalProgress: 0,
+        goalValue: '',
+      },
+      {
+        name: 'SPENDINGS',
+        currentValue: totalOutcome,
+        unit: selectedGoal ? '' : '',
+        goalProgress: 0,
+        goalValue: '',
+      },
+      {
+        name: 'SAVINGS',
+        currentValue: savingsTotal,
+        unit: selectedGoal ? '' : '',
+        goalProgress: 0,
+        goalValue: '',
+      },
+    ],
+    [totalIncome, totalOutcome, savingsTotal, selectedGoal]
+  );
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
         <p className="text-muted-foreground">
-          Your financial dashboard overview
+          {selectedGoal
+            ? `Goal: ${selectedGoal.goal}`
+            : 'Your financial dashboard overview'}
         </p>
       </div>
 
       {/* Top Charts Section */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Net Worth Chart */}
+        {/* Income/Spendings/Savings Trend */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              NET WORTH
+              TREND (last 6 months)
               <Info className="h-4 w-4 text-muted-foreground" />
             </CardTitle>
-            <div className="flex gap-1">
-              {['1Y', '3Y', '5Y', 'Max'].map(period => (
-                <Button
-                  key={period}
-                  variant={period === '1Y' ? 'default' : 'outline'}
-                  size="sm"
-                  className="h-7 px-3 text-xs"
-                >
-                  {period}
-                </Button>
-              ))}
-            </div>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto" />
-                <div className="space-y-2">
-                  <div className="text-3xl font-bold text-blue-600">
-                    $
-                    {netWorthData[
-                      netWorthData.length - 1
-                    ].value.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Current Net Worth
-                  </div>
+            <div className="h-[300px]">
+              {loading ? (
+                <div className="h-full flex items-center justify-center text-muted-foreground">
+                  Loading chart...
                 </div>
-                <div className="flex justify-center space-x-8 text-xs text-muted-foreground">
-                  {netWorthData.map((data, index) => (
-                    <div key={index} className="text-center">
-                      <div className="font-medium">{data.month}</div>
-                      <div>${(data.value / 1000000).toFixed(1)}M</div>
-                    </div>
-                  ))}
+              ) : monthlySeries.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-muted-foreground">
+                  No data to display
                 </div>
-              </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={monthlySeries}
+                    margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="income"
+                      stroke="#3B82F6"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="spendings"
+                      stroke="#F59E0B"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="savings"
+                      stroke="#10B981"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Current Holdings Chart */}
+        {/* Breakdown Pie */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold">
-              CURRENT HOLDINGS
-            </CardTitle>
-            <div className="flex gap-1">
-              {['Assets', 'Debt'].map(type => (
-                <Button
-                  key={type}
-                  variant={type === 'Assets' ? 'default' : 'outline'}
-                  size="sm"
-                  className="h-7 px-3 text-xs"
-                >
-                  {type}
-                </Button>
-              ))}
-            </div>
+            <CardTitle className="text-lg font-semibold">BREAKDOWN</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <PieChart className="h-16 w-16 text-muted-foreground mx-auto" />
-                <div className="space-y-2">
-                  <div className="text-3xl font-bold text-gray-900">
-                    $
-                    {holdingsData
-                      .reduce((sum, item) => sum + item.value, 0)
-                      .toLocaleString()}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Total Value
-                  </div>
+            <div className="h-[300px]">
+              {loading ? (
+                <div className="h-full flex items-center justify-center text-muted-foreground">
+                  Loading chart...
                 </div>
-              </div>
-            </div>
-
-            {/* Holdings Legend */}
-            <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-              {holdingsData.map(item => (
-                <div key={item.name} className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <span className="text-muted-foreground">{item.name}</span>
-                  <span className="ml-auto font-medium">
-                    ${(item.value / 1000).toFixed(0)}K
-                  </span>
-                </div>
-              ))}
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      dataKey="value"
+                      data={holdingsData}
+                      outerRadius={90}
+                      label
+                    >
+                      {holdingsData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -253,11 +247,11 @@ export function DashboardPage() {
               <div key={metric.name} className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-sm">{metric.name}</h3>
-                  {metric.status === 'success' && (
+                  {metric.name === 'SAVINGS' && savingsTotal > 0 && (
                     <CheckCircle className="h-4 w-4 text-green-500" />
                   )}
-                  {metric.overGoal && (
-                    <AlertTriangle className="h-4 w-4 text-red-500" />
+                  {metric.name === 'SPENDINGS' && (
+                    <AlertTriangle className="h-4 w-4 text-orange-500" />
                   )}
                 </div>
 
@@ -268,37 +262,18 @@ export function DashboardPage() {
                   <span className="text-sm text-muted-foreground">
                     {metric.unit}
                   </span>
-                  {metric.overGoal && (
-                    <span className="text-sm text-red-500 flex items-center gap-1">
-                      ▲ {metric.overGoalValue}%
-                    </span>
-                  )}
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">This period</span>
                     <span className="text-muted-foreground">
-                      {metric.goalProgress}% of goal
-                    </span>
-                    <span className="text-muted-foreground">
-                      {metric.goalValue}
+                      {selectedGoal?.goalCurrency || 'USD'}
                     </span>
                   </div>
 
                   <div className="relative">
-                    <Progress
-                      value={Math.min(metric.goalProgress, 100)}
-                      className="h-2"
-                    />
-                    {metric.overGoal && (
-                      <div
-                        className="absolute top-0 left-0 h-2 bg-red-500 rounded-full"
-                        style={{
-                          width: `${Math.min(metric.overGoalValue || 0, 100)}%`,
-                          left: '100%',
-                        }}
-                      />
-                    )}
+                    <Progress value={0} className="h-2" />
                   </div>
                 </div>
               </div>
@@ -306,6 +281,13 @@ export function DashboardPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Actions */}
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm">
+          Export
+        </Button>
+      </div>
     </div>
   );
 }

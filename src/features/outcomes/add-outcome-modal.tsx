@@ -15,7 +15,7 @@ import { useAuth } from '@/shared/hooks/auth';
 import { useAlert } from '@/shared/hooks/alert';
 import { useOutcomes } from '@/entities/outcomes/model/use-outcomes';
 import { useGoalSelection } from '@/app/providers/goal';
-import { addOutcomeSchema, type AddOutcomeFormData } from './schemas';
+import { type AddOutcomeFormData, addOutcomeSchema } from './schemas';
 
 export type AddOutcomeModalProps = {
   open: boolean;
@@ -55,7 +55,7 @@ export function AddOutcomeModal({
     const result = await addOutcome({
       userId: user.uid,
       goalId: selectedGoalId,
-      amount: Number(data.amount),
+      amount: data.amount,
       note: data.note || '',
     });
 

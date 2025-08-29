@@ -30,14 +30,15 @@ export function useIncomes(userId: string | undefined, goalId?: string) {
 
   const baseRef = useMemo(() => {
     if (!userId) return null;
-    return collection(db, firestoreCollection.INCOMES, userId);
+    return collection(db, firestoreCollection.INCOMES);
   }, [userId]);
+  console.log({ goalId });
 
   useEffect(() => {
     if (!userId || !baseRef) return;
 
     try {
-      const constraints = [];
+      const constraints = [where('userId', '==', userId)];
       if (goalId) constraints.push(where('goalId', '==', goalId));
 
       // Use simple query without orderBy to avoid index issues
@@ -119,6 +120,7 @@ export function useIncomes(userId: string | undefined, goalId?: string) {
           variant: 'success',
         };
       } catch (error: unknown) {
+        console.log('error', error);
         return handleFirebaseError(error);
       }
     },

@@ -236,7 +236,14 @@ export function GoalsPage() {
                       <Button variant="outline" size="sm" className="flex-1">
                         Update Progress
                       </Button>
-                      <Button variant="outline" size="sm" className="flex-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          openModal('edit-goal', { goalId: goal.id });
+                        }}
+                      >
                         Edit Goal
                       </Button>
                     </div>

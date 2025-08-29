@@ -1,36 +1,106 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { appPath } from '@/shared/constants/app-path.ts';
-import { MainLayout } from '@/shared/components/layouts/main-layout.tsx';
-import { DashboardPage } from '@/pages/dashboard';
-import { ProfilePage } from '@/pages/profile';
-import { ExpensesPage } from '@/pages/expenses';
-import { IncomePage } from '@/pages/income';
-import { GoalsPage } from '@/pages/goals';
+import { lazy, Suspense } from 'react';
+import { LoaderWrapper } from '@/shared/components/custom/loader';
+
+const MainLayout = lazy(() =>
+  import('@/shared/components/layouts/main-layout.tsx').then(m => ({
+    default: m.MainLayout,
+  }))
+);
+const DashboardPage = lazy(() =>
+  import('@/pages/dashboard').then(m => ({ default: m.DashboardPage }))
+);
+const ProfilePage = lazy(() =>
+  import('@/pages/profile').then(m => ({ default: m.ProfilePage }))
+);
+const ExpensesPage = lazy(() =>
+  import('@/pages/expenses').then(m => ({ default: m.ExpensesPage }))
+);
+const IncomePage = lazy(() =>
+  import('@/pages/income').then(m => ({ default: m.IncomePage }))
+);
+const GoalsPage = lazy(() =>
+  import('@/pages/goals').then(m => ({ default: m.GoalsPage }))
+);
 
 export const authenticatedRoutes = createBrowserRouter([
   {
     path: appPath.MAIN_PATH,
-    element: <MainLayout />,
+    element: (
+      <Suspense
+        fallback={
+          <LoaderWrapper
+            message="Loading..."
+            overlay
+            variant="fullscreen"
+            loading
+          />
+        }
+      >
+        <MainLayout />
+      </Suspense>
+    ),
     children: [
       {
         index: true,
-        element: <DashboardPage />,
+        element: (
+          <Suspense
+            fallback={
+              <LoaderWrapper message="Loading dashboard..." overlay loading />
+            }
+          >
+            <DashboardPage />
+          </Suspense>
+        ),
       },
       {
         path: appPath.PROFILE,
-        element: <ProfilePage />,
+        element: (
+          <Suspense
+            fallback={
+              <LoaderWrapper message="Loading profile..." overlay loading />
+            }
+          >
+            <ProfilePage />
+          </Suspense>
+        ),
       },
       {
         path: appPath.EXPENSE,
-        element: <ExpensesPage />,
+        element: (
+          <Suspense
+            fallback={
+              <LoaderWrapper message="Loading expenses..." overlay loading />
+            }
+          >
+            <ExpensesPage />
+          </Suspense>
+        ),
       },
       {
         path: appPath.INCOME,
-        element: <IncomePage />,
+        element: (
+          <Suspense
+            fallback={
+              <LoaderWrapper message="Loading income..." overlay loading />
+            }
+          >
+            <IncomePage />
+          </Suspense>
+        ),
       },
       {
         path: appPath.GOALS,
-        element: <GoalsPage />,
+        element: (
+          <Suspense
+            fallback={
+              <LoaderWrapper message="Loading goals..." overlay loading />
+            }
+          >
+            <GoalsPage />
+          </Suspense>
+        ),
       },
     ],
   },

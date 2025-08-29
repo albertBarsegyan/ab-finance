@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
 import { Badge } from '@/shared/components/ui/badge';
-import { ChevronDown, Plus, Target, Check } from 'lucide-react';
+import { Check, ChevronDown, Plus, Target } from 'lucide-react';
 import { useModal } from '@/shared/hooks/modal';
 import { useGoalSelection } from '@/app/providers/goal';
 import { appPath } from '@/shared/constants/app-path';
@@ -81,9 +81,6 @@ export function UserGoalsDropdown() {
                       <Check className="h-4 w-4 text-green-600" />
                     )}
                   </div>
-                  <Badge variant="outline" className="text-xs">
-                    Step {goal.step}
-                  </Badge>
                 </div>
                 <div className="flex items-center justify-between w-full">
                   <span className="text-xs text-gray-500">

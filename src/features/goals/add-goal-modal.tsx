@@ -22,7 +22,7 @@ import { useAuth } from '@/shared/hooks/auth';
 import { useGoalSelection } from '@/app/providers/goal';
 import { currencies } from '@/shared/constants/currencies';
 import { ChevronDown } from 'lucide-react';
-import { addGoalSchema, type AddGoalFormData } from './schemas';
+import { type AddGoalFormData, addGoalSchema } from './schemas';
 
 export type AddGoalModalProps = {
   open: boolean;
@@ -67,7 +67,6 @@ export function AddGoalModal({
       goal: data.goal.trim(),
       goalPrice: data.goalPrice,
       goalCurrency: data.goalCurrency,
-      step: 1,
       userId: user.uid,
     });
 

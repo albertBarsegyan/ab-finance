@@ -1,20 +1,25 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
 import {
-  useGoalsWithSelection,
   type Goal,
+  useGoalsWithSelection,
 } from '@/entities/goals/model/use-goals-with-selection';
 import { useAuth } from '@/shared/hooks/auth';
+import type { FirebaseError } from 'firebase/app';
 
 interface GoalContextType {
   goals: Goal[];
   loading: boolean;
-  error: any;
+  error: FirebaseError | null;
   selectedGoal: Goal | null;
   setSelectedGoal: (goal: Goal | null) => void;
   selectedGoalId: string | null;
   addGoal: (
-    goalData: Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>
+    goalData: Omit<Goal, 'id' | 'createdAt' | 'updatedAt' | 'step'>
+  ) => Promise<{ success: boolean; error?: string }>;
+  updateGoal: (
+    goalId: string,
+    updates: Partial<Pick<Goal, 'goal' | 'goalPrice' | 'goalCurrency'>>
   ) => Promise<{ success: boolean; error?: string }>;
 }
 

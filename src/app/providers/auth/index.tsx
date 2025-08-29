@@ -13,9 +13,11 @@ type AuthContextType = {
   initializing: boolean;
   signUp?: (props: SignUpProps) => Promise<AlertState>;
   signIn?: (props: SignInProps) => Promise<AlertState>;
+  signInWithGoogle?: () => Promise<AlertState>;
   signOut?: () => Promise<AlertState>;
   forgotPassword: (email: string) => void;
   fetchUserDocument: (uid: string) => Promise<UserAdditional | null>;
+  updateUserProfile?: (data: Partial<UserAdditional>) => Promise<AlertState>;
 };
 
 export type SignUpProps = {

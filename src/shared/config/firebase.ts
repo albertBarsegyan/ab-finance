@@ -1,5 +1,5 @@
-import { getApps, initializeApp } from 'firebase/app';
-import { getAnalytics } from 'firebase/analytics';
+import { type FirebaseApp, getApps, initializeApp } from 'firebase/app';
+import { type Analytics, getAnalytics } from 'firebase/analytics';
 import { type Auth, getAuth } from 'firebase/auth';
 import { Firestore, getFirestore } from 'firebase/firestore';
 
@@ -13,7 +13,6 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Validate required Firebase config
 if (
   !firebaseConfig.apiKey ||
   !firebaseConfig.projectId ||
@@ -40,7 +39,7 @@ export const firestoreCollection = {
 };
 
 // Initialize Firebase app only if it hasn't been initialized already
-let firebaseApp;
+let firebaseApp: FirebaseApp;
 try {
   if (getApps().length === 0) {
     firebaseApp = initializeApp(firebaseConfig);
@@ -71,7 +70,7 @@ try {
 export { auth, db };
 
 // Initialize analytics only in production and when measurementId is available
-let analytics;
+let analytics: Analytics;
 try {
   if (import.meta.env.PROD && firebaseConfig.measurementId) {
     analytics = getAnalytics(firebaseApp);

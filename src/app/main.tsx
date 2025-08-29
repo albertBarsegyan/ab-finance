@@ -1,4 +1,3 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { AuthProvider } from '@/app/providers/auth';
@@ -7,11 +6,13 @@ import { ModalProvider } from '@/app/providers/modal';
 import { GoalProvider } from '@/app/providers/goal';
 import { GlobalPopups } from '@/shared/components/global-popups';
 import { AppRouter } from '@/app/routes';
+import { ErrorBoundary } from '@/shared/components/error-boundary';
 
 import '@/app/styles/index.css';
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
+  <ErrorBoundary>
     <AuthProvider>
       <AlertProvider>
         <ModalProvider>
@@ -22,5 +23,6 @@ createRoot(document.getElementById('root')!).render(
         </ModalProvider>
       </AlertProvider>
     </AuthProvider>
-  </StrictMode>
+  </ErrorBoundary>
+  // </StrictMode>
 );

@@ -3,10 +3,11 @@ import { createContext, type ReactNode, useState } from 'react';
 export interface ModalState {
   isOpen: boolean;
   modalId: string | null;
+  payload?: unknown;
 }
 
 export interface ModalContextType extends ModalState {
-  openModal: (modalId: string) => void;
+  openModal: (modalId: string, payload?: unknown) => void;
   closeModal: () => void;
 }
 
@@ -20,12 +21,12 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     modalId: null,
   });
 
-  const openModal = (modalId: string) => {
-    setModal({ isOpen: true, modalId });
+  const openModal = (modalId: string, payload?: unknown) => {
+    setModal({ isOpen: true, modalId, payload });
   };
 
   const closeModal = () => {
-    setModal({ isOpen: false, modalId: null });
+    setModal({ isOpen: false, modalId: null, payload: undefined });
   };
 
   return (
@@ -33,6 +34,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
       value={{
         isOpen: modal.isOpen,
         modalId: modal.modalId,
+        payload: modal.payload,
         openModal,
         closeModal,
       }}

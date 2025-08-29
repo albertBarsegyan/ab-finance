@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   addDoc,
   collection,
@@ -13,7 +13,6 @@ export interface Goal {
   goal: string;
   goalCurrency: string;
   goalPrice: string;
-  step: number;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -29,6 +28,10 @@ interface UseGoalsWithSelectionResult {
   addGoal: (
     goalData: Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>
   ) => Promise<{ success: boolean; error?: string }>;
+  updateGoal: (
+    goalId: string,
+    updates: Partial<Pick<Goal, 'goal' | 'goalPrice' | 'goalCurrency'>>
+  ) => Promise<{ success: boolean; error?: string }>;
 }
 
 const SELECTED_GOAL_STORAGE_KEY = 'selectedGoalId';
@@ -43,13 +46,11 @@ export function useGoalsWithSelection(
 
   // Load selected goal from localStorage on mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedGoalId = localStorage.getItem(SELECTED_GOAL_STORAGE_KEY);
-      if (storedGoalId && goals.length > 0) {
-        const goal = goals.find(g => g.id === storedGoalId);
-        if (goal) {
-          setSelectedGoalState(goal);
-        }
+    const storedGoalId = localStorage.getItem(SELECTED_GOAL_STORAGE_KEY);
+    if (storedGoalId && goals.length > 0) {
+      const goal = goals.find(g => g.id === storedGoalId);
+      if (goal) {
+        setSelectedGoalState(goal);
       }
     }
   }, [goals]);
@@ -166,6 +167,36 @@ export function useGoalsWithSelection(
     }
   };
 
+  const updateGoal = async (
+    goalId: string,
+    updates: Partial<Pick<Goal, 'goal' | 'goalPrice' | 'goalCurrency'>>
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+      const { doc, updateDoc } = await import('firebase/firestore');
+      const goalRef = doc(
+        db,
+        firestoreCollection.USERS,
+        userId,
+        firestoreCollection.GOALS,
+        goalId
+      );
+
+      await updateDoc(goalRef, {
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating goal:', error);
+      return { success: false, error: 'Failed to update goal' };
+    }
+  };
+
   return {
     goals,
     loading,
@@ -174,5 +205,6 @@ export function useGoalsWithSelection(
     selectedGoalId: selectedGoal?.id || null,
     setSelectedGoal,
     addGoal,
+    updateGoal,
   };
 }
