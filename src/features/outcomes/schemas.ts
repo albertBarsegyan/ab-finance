@@ -9,4 +9,4 @@ export const addOutcomeSchema = z.object({
   note: z.string().optional(),
 });
 
-export type AddOutcomeFormData = z.infer<typeof addOutcomeSchema>; 
+export type AddOutcomeFormData = z.infer<typeof addOutcomeSchema>;

@@ -17,9 +17,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import { useAuth } from '@/shared/hooks/auth';
 import { useAlert } from '@/shared/hooks/alert';
-import { useGoals } from '@/entities/goals/model/use-goals';
+import { useAuth } from '@/shared/hooks/auth';
+import { useGoalSelection } from '@/app/providers/goal';
 import { currencies } from '@/shared/constants/currencies';
 import { ChevronDown } from 'lucide-react';
 import { addGoalSchema, type AddGoalFormData } from './schemas';
@@ -33,11 +33,11 @@ export function AddGoalModal({
   open,
   onOpenChange,
 }: Readonly<AddGoalModalProps>) {
-  const { user } = useAuth();
   const { setAlert } = useAlert();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const { addGoal } = useGoals(user?.uid);
+  const { addGoal } = useGoalSelection();
 
   const {
     register,
@@ -146,7 +146,9 @@ export function AddGoalModal({
               </DropdownMenuContent>
             </DropdownMenu>
             {errors.goalCurrency && (
-              <p className="text-sm text-red-500">{errors.goalCurrency.message}</p>
+              <p className="text-sm text-red-500">
+                {errors.goalCurrency.message}
+              </p>
             )}
           </div>
 

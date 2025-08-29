@@ -9,4 +9,4 @@ export const addIncomeSchema = z.object({
   note: z.string().optional(),
 });
 
-export type AddIncomeFormData = z.infer<typeof addIncomeSchema>; 
+export type AddIncomeFormData = z.infer<typeof addIncomeSchema>;

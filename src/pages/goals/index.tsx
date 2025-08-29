@@ -22,8 +22,7 @@ import {
 } from 'lucide-react';
 import { useMemo } from 'react';
 import { useModal } from '@/shared/hooks/modal';
-import { useAuth } from '@/shared/hooks/auth';
-import { useGoals } from '@/entities/goals/model/use-goals';
+import { useGoalSelection } from '@/app/providers/goal';
 
 // Helper function to get icon and color based on goal name
 const getGoalIconAndColor = (goalName: string) => {
@@ -49,8 +48,7 @@ const getGoalIconAndColor = (goalName: string) => {
 
 export function GoalsPage() {
   const { openModal } = useModal();
-  const { user } = useAuth();
-  const { goals, loading } = useGoals(user?.uid);
+  const { goals, loading } = useGoalSelection();
   console.log({ goals });
   // Transform goals data for display
   const displayGoals = useMemo(() => {

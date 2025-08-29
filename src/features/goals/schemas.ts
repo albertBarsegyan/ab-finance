@@ -12,9 +12,7 @@ export const addGoalSchema = z.object({
     .min(1, 'Goal price is required')
     .refine(val => !isNaN(Number(val)), 'Goal price must be a valid number')
     .refine(val => Number(val) > 0, 'Goal price must be greater than 0'),
-  goalCurrency: z
-    .string()
-    .min(1, 'Currency is required'),
+  goalCurrency: z.string().min(1, 'Currency is required'),
 });
 
-export type AddGoalFormData = z.infer<typeof addGoalSchema>; 
+export type AddGoalFormData = z.infer<typeof addGoalSchema>;

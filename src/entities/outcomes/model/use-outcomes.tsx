@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   addDoc,
   collection,
+  FirestoreError,
   onSnapshot,
   query,
   where,
-  FirestoreError,
 } from 'firebase/firestore';
 import { db, firestoreCollection } from '@/shared/config/firebase.ts';
 import type { AlertState } from '@/app/providers/alert';
@@ -28,20 +28,23 @@ export function useOutcomes(userId: string | undefined, goalId?: string) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<FirestoreError | null>(null);
 
-  const baseRef = useMemo(
-    () => collection(db, firestoreCollection.OUTCOMES),
-    []
-  );
+  const baseRef = useMemo(() => {
+    if (!userId) return null;
+    return collection(db, firestoreCollection.OUTCOMES, userId);
+  }, [userId]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !baseRef) return;
 
     try {
-      const constraints = [where('userId', '==', userId)];
+      const constraints = [];
       if (goalId) constraints.push(where('goalId', '==', goalId));
 
       // Use simple query without orderBy to avoid index issues
-      const q = query(baseRef, ...constraints);
+      const q =
+        constraints.length > 0
+          ? query(baseRef, ...constraints)
+          : query(baseRef);
 
       const unsubscribe = onSnapshot(
         q,
@@ -53,8 +56,13 @@ export function useOutcomes(userId: string | undefined, goalId?: string) {
 
           // Sort manually by createdAt
           items.sort((a, b) => {
-            const aTime = a.createdAt ? new Date(a.createdAt as any).getTime() : 0;
-            const bTime = b.createdAt ? new Date(b.createdAt as any).getTime() : 0;
+            const aTime = a.createdAt
+              ? new Date(a.createdAt as number).getTime()
+              : 0;
+
+            const bTime = b.createdAt
+              ? new Date(b.createdAt as number).getTime()
+              : 0;
             return bTime - aTime;
           });
 
@@ -88,6 +96,13 @@ export function useOutcomes(userId: string | undefined, goalId?: string) {
       if (!data?.goalId) {
         return {
           message: 'goalId is required to add an outcome.',
+          variant: 'destructive',
+        };
+      }
+
+      if (!baseRef) {
+        return {
+          message: 'Collection reference not available.',
           variant: 'destructive',
         };
       }

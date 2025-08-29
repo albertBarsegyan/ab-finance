@@ -17,6 +17,8 @@ export type Income = {
   goalId: string;
   createdAt?: unknown;
   updatedAt?: unknown;
+  amount: number;
+  note: string;
 };
 
 export type NewIncome = Omit<Income, 'id' | 'createdAt' | 'updatedAt'>;
@@ -26,20 +28,23 @@ export function useIncomes(userId: string | undefined, goalId?: string) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<FirestoreError | null>(null);
 
-  const baseRef = useMemo(
-    () => collection(db, firestoreCollection.INCOMES),
-    []
-  );
+  const baseRef = useMemo(() => {
+    if (!userId) return null;
+    return collection(db, firestoreCollection.INCOMES, userId);
+  }, [userId]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !baseRef) return;
 
     try {
-      const constraints = [where('userId', '==', userId)];
+      const constraints = [];
       if (goalId) constraints.push(where('goalId', '==', goalId));
 
       // Use simple query without orderBy to avoid index issues
-      const q = query(baseRef, ...constraints);
+      const q =
+        constraints.length > 0
+          ? query(baseRef, ...constraints)
+          : query(baseRef);
 
       const unsubscribe = onSnapshot(
         q,
@@ -91,6 +96,13 @@ export function useIncomes(userId: string | undefined, goalId?: string) {
       if (!data?.goalId) {
         return {
           message: 'goalId is required to add an income.',
+          variant: 'destructive',
+        };
+      }
+
+      if (!baseRef) {
+        return {
+          message: 'Collection reference not available.',
           variant: 'destructive',
         };
       }

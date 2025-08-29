@@ -10,18 +10,14 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { Badge } from '@/shared/components/ui/badge';
 import { ChevronDown, Plus, Target, Check } from 'lucide-react';
-import { useGoals } from '@/entities/goals/model/use-goals';
-import { useAuth } from '@/shared/hooks/auth';
 import { useModal } from '@/shared/hooks/modal';
 import { useGoalSelection } from '@/app/providers/goal';
 import { appPath } from '@/shared/constants/app-path';
 import { Link } from 'react-router-dom';
 
 export function UserGoalsDropdown() {
-  const { user } = useAuth();
-  const { goals, loading } = useGoals(user?.uid);
+  const { goals, loading, selectedGoal, setSelectedGoal } = useGoalSelection();
   const { openModal } = useModal();
-  const { selectedGoal, setSelectedGoal } = useGoalSelection();
   const [open, setOpen] = useState(false);
 
   const formatCurrency = (amount: string, currency: string) => {

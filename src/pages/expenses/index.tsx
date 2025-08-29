@@ -30,7 +30,7 @@ type TransactionDisplay = {
   category: string;
   date: string;
   type: 'income' | 'expense';
-  icon: any;
+  icon: unknown;
 };
 
 const categories = [
@@ -209,6 +209,7 @@ export function ExpensesPage() {
             ) : (
               transactions.map((transaction: TransactionDisplay) => {
                 const IconComponent = transaction.icon;
+
                 return (
                   <div
                     key={transaction.id}
