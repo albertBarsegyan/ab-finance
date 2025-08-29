@@ -14,10 +14,13 @@ import {
   AvatarImage,
 } from '@/shared/components/ui/avatar';
 import { Badge } from '@/shared/components/ui/badge';
-import { Calendar, Edit, Mail, MapPin, Save, User, X } from 'lucide-react';
+import { Calendar, Edit, Image, Mail, MapPin, Save, User, X } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 import { useAlert } from '@/shared/hooks/alert.tsx';
+import { useBackgroundImage } from '@/shared/hooks/background-image.tsx';
+import { BackgroundImageModal } from '@/shared/components/custom/background-image-modal.tsx';
+import { StorageInfo } from '@/shared/components/custom/storage-info.tsx';
 import { useGoals } from '@/entities/goals/model/use-goals.tsx';
 import { useIncomes } from '@/entities/incomes/model/use-incomes.tsx';
 import { useOutcomes } from '@/entities/outcomes/model/use-outcomes.tsx';
@@ -25,7 +28,9 @@ import { useOutcomes } from '@/entities/outcomes/model/use-outcomes.tsx';
 export function ProfilePage() {
   const { setAlert } = useAlert();
   const { user, userAdditional, updateUserProfile } = useAuth();
+  const { backgroundImage, updateBackgroundImage } = useBackgroundImage();
   const [isEditing, setIsEditing] = useState(false);
+  const [backgroundModalOpen, setBackgroundModalOpen] = useState(false);
   const [firstName, setFirstName] = useState(userAdditional?.firstName || '');
   const [lastName, setLastName] = useState(userAdditional?.lastName || '');
   const [email] = useState(userAdditional?.email || user?.email || '');
@@ -58,9 +63,9 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Profile</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Profile</h1>
           <p className="text-muted-foreground">
             Manage your account settings and preferences.
           </p>
@@ -68,6 +73,7 @@ export function ProfilePage() {
         <Button
           variant={isEditing ? 'outline' : 'default'}
           onClick={() => setIsEditing(!isEditing)}
+          className="w-full sm:w-auto"
         >
           {isEditing ? (
             <>
@@ -83,7 +89,7 @@ export function ProfilePage() {
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         {/* Profile Information */}
         <Card>
           <CardHeader>
@@ -93,12 +99,12 @@ export function ProfilePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col items-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
               <Avatar className="h-20 w-20">
                 <AvatarImage src="/placeholder-avatar.jpg" alt="Profile" />
                 <AvatarFallback>{getInitials()}</AvatarFallback>
               </Avatar>
-              <div className="space-y-1">
+              <div className="space-y-1 text-center sm:text-left">
                 <h3 className="text-lg font-medium">
                   {userAdditional
                     ? `${userAdditional.firstName} ${userAdditional.lastName}`
@@ -114,7 +120,7 @@ export function ProfilePage() {
             </div>
 
             <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">First Name</Label>
                   <div className="relative">
@@ -235,6 +241,23 @@ export function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-medium">App Background</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Customize your app background image
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setBackgroundModalOpen(true)}
+                >
+                  <Image className="mr-2 h-4 w-4" />
+                  Customize
+                </Button>
+              </div>
+
               {/*<div className="flex items-center justify-between">*/}
               {/*  <div>*/}
               {/*    <h4 className="text-sm font-medium">Email Notifications</h4>*/}
@@ -271,6 +294,9 @@ export function ProfilePage() {
         </Card>
       </div>
 
+      {/* Storage Information */}
+      <StorageInfo />
+
       {/* Account Statistics */}
       <Card>
         <CardHeader>
@@ -280,24 +306,32 @@ export function ProfilePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             <div className="text-center">
-              <div className="text-2xl font-bold">{totalTransactions}</div>
+              <div className="text-xl font-bold sm:text-2xl">{totalTransactions}</div>
               <div className="text-sm text-muted-foreground">
                 Total Transactions
               </div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{daysActive}</div>
+              <div className="text-xl font-bold sm:text-2xl">{daysActive}</div>
               <div className="text-sm text-muted-foreground">Days Active</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{goalsCount}</div>
+              <div className="text-xl font-bold sm:text-2xl">{goalsCount}</div>
               <div className="text-sm text-muted-foreground">Goals</div>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Background Image Modal */}
+      <BackgroundImageModal
+        open={backgroundModalOpen}
+        onOpenChange={setBackgroundModalOpen}
+        currentBackgroundImage={backgroundImage || undefined}
+        onBackgroundImageChange={updateBackgroundImage}
+      />
     </div>
   );
 }

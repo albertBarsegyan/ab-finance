@@ -133,7 +133,9 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          Overview
+        </h1>
         <p className="text-muted-foreground">
           {selectedGoal
             ? `Goal: ${selectedGoal.goal}`
@@ -142,17 +144,17 @@ export function DashboardPage() {
       </div>
 
       {/* Top Charts Section */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         {/* Income/Spendings/Savings Trend */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            <CardTitle className="text-base font-semibold sm:text-lg flex items-center gap-2">
               TREND (last 6 months)
               <Info className="h-4 w-4 text-muted-foreground" />
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[250px] sm:h-[300px]">
               {loading ? (
                 <div className="h-full flex items-center justify-center text-muted-foreground">
                   Loading chart...
@@ -203,10 +205,12 @@ export function DashboardPage() {
         {/* Breakdown Pie */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold">BREAKDOWN</CardTitle>
+            <CardTitle className="text-base font-semibold sm:text-lg">
+              BREAKDOWN
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[250px] sm:h-[300px]">
               {loading ? (
                 <div className="h-full flex items-center justify-center text-muted-foreground">
                   Loading chart...
@@ -217,7 +221,7 @@ export function DashboardPage() {
                     <Pie
                       dataKey="value"
                       data={holdingsData}
-                      outerRadius={90}
+                      outerRadius={80}
                       label
                     >
                       {holdingsData.map((entry, index) => (
@@ -237,12 +241,12 @@ export function DashboardPage() {
       {/* Financial Metrics Grid */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">
+          <CardTitle className="text-base font-semibold sm:text-lg">
             Financial Metrics
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {financialMetrics.map(metric => (
               <div key={metric.name} className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -256,7 +260,7 @@ export function DashboardPage() {
                 </div>
 
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold">
+                  <span className="text-xl font-bold sm:text-2xl">
                     {metric.currentValue.toLocaleString()}
                   </span>
                   <span className="text-sm text-muted-foreground">
@@ -284,7 +288,7 @@ export function DashboardPage() {
 
       {/* Actions */}
       <div className="flex gap-2">
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="w-full sm:w-auto">
           Export
         </Button>
       </div>

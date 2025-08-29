@@ -20,6 +20,7 @@ import {
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 import { useAlert } from '@/shared/hooks/alert.tsx';
+import { GoogleIcon } from '@/shared/components/icons/google-icon.tsx';
 
 export function RegisterForm() {
   const { setAlert } = useAlert();
@@ -238,11 +239,11 @@ export function RegisterForm() {
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full flex items-center justify-center"
             onClick={onGoogleSignUp}
             disabled={isLoading}
           >
-            Continue with Google
+            <span> Continue with Google</span> <GoogleIcon />
           </Button>
         </form>
 

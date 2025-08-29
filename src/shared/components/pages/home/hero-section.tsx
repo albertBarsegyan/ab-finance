@@ -1,5 +1,5 @@
 import { Button } from '@/shared/components/ui/button';
-import { Badge, Play, Star } from 'lucide-react';
+import { Badge, Star } from 'lucide-react';
 import { LazyImage } from '@/shared/components/lazy-image';
 import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 
@@ -29,10 +29,10 @@ export function HeroSection() {
                 <Star className="mr-2 h-4 w-4" />
                 Get started
               </Button>
-              <Button variant="outline" size="lg">
-                <Play className="mr-2 h-4 w-4" />
-                Watch Demo
-              </Button>
+              {/*<Button variant="outline" size="lg">*/}
+              {/*  <Play className="mr-2 h-4 w-4" />*/}
+              {/*  Watch Demo*/}
+              {/*</Button>*/}
             </div>
             <div className="flex items-center gap-4 text-sm text-gray-600">
               <div className="flex items-center gap-1">

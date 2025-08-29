@@ -71,28 +71,36 @@ export function IncomePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col space-y-4 lg:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Income</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Income
+          </h1>
+
           <p className="text-muted-foreground">
             Track your Income and stay within your budget limits.
           </p>
         </div>
-        <Button onClick={() => openModal('add-income')}>
+        <Button
+          onClick={() => openModal('add-income')}
+          className="w-full sm:w-auto"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Create Income
         </Button>
       </div>
 
       {/* Budget Overview */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalIncome.toFixed(2)}</div>
+            <div className="text-xl font-bold sm:text-2xl">
+              ${totalIncome.toFixed(2)}
+            </div>
             <p className="text-xs text-muted-foreground">Total Income</p>
           </CardContent>
         </Card>
@@ -123,7 +131,7 @@ export function IncomePage() {
                   return (
                     <div
                       key={income.id}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className="flex flex-col space-y-3 p-3 border rounded-lg sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
                     >
                       <div className="flex items-center space-x-3">
                         <div
@@ -131,8 +139,8 @@ export function IncomePage() {
                         >
                           <IconComponent className="h-4 w-4 text-white" />
                         </div>
-                        <div>
-                          <p className="font-medium">{income.name}</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium truncate">{income.name}</p>
                           <p className="text-sm text-muted-foreground">
                             {income.date}
                           </p>

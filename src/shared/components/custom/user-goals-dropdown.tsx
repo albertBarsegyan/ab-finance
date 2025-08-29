@@ -32,21 +32,24 @@ export function UserGoalsDropdown() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="w-full justify-start flex space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+          size="sm"
+          className="lg:w-full justify-start flex space-x-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900"
         >
-          <Target className="h-4 w-4" />
-          <span>{selectedGoal ? selectedGoal.goal : 'Select Goal'}</span>
+          <Target className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="truncate">
+            {selectedGoal ? selectedGoal.goal : 'Select Goal'}
+          </span>
           <ChevronDown className="h-3 w-3" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-80"
+        className="w-72 sm:w-80"
         align="start"
         side="bottom"
         sideOffset={8}
       >
         <DropdownMenuLabel className="flex items-center justify-between">
-          <span>Your Financial Goals</span>
+          <span className="text-sm">Your Financial Goals</span>
           <Badge variant="secondary" className="text-xs">
             {goals.length}
           </Badge>
@@ -74,7 +77,7 @@ export function UserGoalsDropdown() {
               >
                 <div className="flex items-center justify-between w-full mb-1">
                   <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm truncate max-w-48">
+                    <span className="font-medium text-sm truncate max-w-40 sm:max-w-48">
                       {goal.goal}
                     </span>
                     {selectedGoal?.id === goal.id && (

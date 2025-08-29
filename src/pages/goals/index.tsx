@@ -23,6 +23,9 @@ import {
 import { useMemo } from 'react';
 import { useModal } from '@/shared/hooks/modal';
 import { useGoalSelection } from '@/app/providers/goal';
+import { useAuth } from '@/shared/hooks/auth';
+import { useIncomes } from '@/entities/incomes/model/use-incomes';
+import { useOutcomes } from '@/entities/outcomes/model/use-outcomes';
 
 // Helper function to get icon and color based on goal name
 const getGoalIconAndColor = (goalName: string) => {
@@ -49,16 +52,26 @@ const getGoalIconAndColor = (goalName: string) => {
 export function GoalsPage() {
   const { openModal } = useModal();
   const { goals, loading } = useGoalSelection();
+  const { user } = useAuth();
+  const { incomes } = useIncomes(user?.uid);
+  const { outcomes } = useOutcomes(user?.uid);
   console.log({ goals });
   // Transform goals data for display
   const displayGoals = useMemo(() => {
     return goals.map(goal => {
       const { icon, color } = getGoalIconAndColor(goal.goal);
       const targetAmount = parseFloat(goal.goalPrice) || 0;
-      const currentAmount = 0; // TODO: Calculate from incomes/outcomes for this goal
+      const incomesTotal = incomes
+        .filter(i => i.goalId === goal.id)
+        .reduce((sum, i) => sum + Number(i.amount || 0), 0);
+      const outcomesTotal = outcomes
+        .filter(o => o.goalId === goal.id)
+        .reduce((sum, o) => sum + Number(o.amount || 0), 0);
+      const currentAmount = Math.max(0, incomesTotal - outcomesTotal);
       const progress =
         targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
-      const status = progress >= 100 ? 'completed' : 'in-progress';
+      const status =
+        currentAmount >= targetAmount ? 'completed' : 'in-progress';
 
       return {
         id: goal.id,
@@ -69,11 +82,11 @@ export function GoalsPage() {
         icon,
         color,
         status,
-        progress,
+        progress: Math.min(100, progress),
         currency: goal.goalCurrency,
       };
     });
-  }, [goals]);
+  }, [goals, incomes, outcomes]);
 
   const totalTarget = displayGoals.reduce((sum, goal) => sum + goal.target, 0);
   const totalCurrent = displayGoals.reduce(
@@ -86,28 +99,33 @@ export function GoalsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Financial Goals</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Financial Goals
+          </h1>
           <p className="text-muted-foreground">
             Set and track your financial goals to achieve your dreams.
           </p>
         </div>
-        <Button onClick={() => openModal('add-goal')}>
+        <Button
+          onClick={() => openModal('add-goal')}
+          className="w-full sm:w-auto"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Create Goal
         </Button>
       </div>
 
       {/* Goals Overview */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Target</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl font-bold sm:text-2xl">
               ${totalTarget.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">Across all goals</p>
@@ -120,7 +138,7 @@ export function GoalsPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl font-bold sm:text-2xl">
               ${totalCurrent.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">Across all goals</p>
@@ -133,7 +151,7 @@ export function GoalsPage() {
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl font-bold sm:text-2xl">
               {((totalCurrent / totalTarget) * 100).toFixed(1)}%
             </div>
             <p className="text-xs text-muted-foreground">Overall progress</p>
@@ -146,20 +164,22 @@ export function GoalsPage() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{completedGoals}</div>
+            <div className="text-xl font-bold sm:text-2xl">
+              {completedGoals}
+            </div>
             <p className="text-xs text-muted-foreground">Goals achieved</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Goals List */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
         {loading ? (
-          <div className="col-span-2 text-center py-8">
+          <div className="col-span-1 lg:col-span-2 text-center py-8">
             <p className="text-muted-foreground">Loading goals...</p>
           </div>
         ) : displayGoals.length === 0 ? (
-          <div className="col-span-2 text-center py-8">
+          <div className="col-span-1 lg:col-span-2 text-center py-8">
             <p className="text-muted-foreground">
               No goals found. Create your first goal!
             </p>
@@ -176,16 +196,20 @@ export function GoalsPage() {
                 className={isCompleted ? 'border-green-200 bg-green-50' : ''}
               >
                 <CardHeader>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                     <div className="flex items-center space-x-2">
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center ${goal.color}`}
                       >
                         <IconComponent className="h-4 w-4 text-white" />
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">{goal.name}</CardTitle>
-                        <CardDescription>{goal.description}</CardDescription>
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-base sm:text-lg truncate">
+                          {goal.name}
+                        </CardTitle>
+                        <CardDescription className="truncate">
+                          {goal.description}
+                        </CardDescription>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -194,7 +218,10 @@ export function GoalsPage() {
                       ) : (
                         <Clock className="h-4 w-4 text-yellow-500" />
                       )}
-                      <Badge variant={isCompleted ? 'default' : 'secondary'}>
+                      <Badge
+                        variant={isCompleted ? 'default' : 'secondary'}
+                        className="text-xs"
+                      >
                         {isCompleted ? 'Completed' : 'In Progress'}
                       </Badge>
                     </div>
@@ -211,8 +238,12 @@ export function GoalsPage() {
                       </div>
                       <Progress value={progress} className="w-full" />
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>${goal.current.toLocaleString()} saved</span>
-                        <span>${goal.target.toLocaleString()} target</span>
+                        <span className="truncate">
+                          ${goal.current.toLocaleString()} saved
+                        </span>
+                        <span className="truncate">
+                          ${goal.target.toLocaleString()} target
+                        </span>
                       </div>
                     </div>
 
@@ -232,10 +263,7 @@ export function GoalsPage() {
                       </div>
                     )}
 
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        Update Progress
-                      </Button>
+                    <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
                       <Button
                         variant="outline"
                         size="sm"

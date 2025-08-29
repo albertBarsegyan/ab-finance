@@ -56,15 +56,20 @@ export function ExpensesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Expenses</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Expenses
+          </h1>
           <p className="text-muted-foreground">
             View and manage your financial expenses.
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button onClick={() => openModal('add-outcome')}>
+          <Button
+            onClick={() => openModal('add-outcome')}
+            className="w-full sm:w-auto"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Expense
           </Button>
@@ -72,7 +77,7 @@ export function ExpensesPage() {
       </div>
 
       {/* Transaction Summary */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -81,7 +86,7 @@ export function ExpensesPage() {
             <TrendingDown className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-xl font-bold text-red-600 sm:text-2xl">
               $
               {outcomes
 
@@ -119,7 +124,7 @@ export function ExpensesPage() {
                 return (
                   <div
                     key={transaction.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                    className="flex flex-col space-y-3 p-4 border rounded-lg hover:bg-gray-50 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
                   >
                     <div className="flex items-center space-x-4">
                       <div
@@ -137,22 +142,23 @@ export function ExpensesPage() {
                           }`}
                         />
                       </div>
-                      <div>
-                        <h4 className="font-medium">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-medium truncate">
                           {transaction.description}
                         </h4>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground truncate">
                           {transaction.category} • {transaction.date}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col items-end space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
                       <Badge
                         variant={
                           transaction.type === 'income'
                             ? 'default'
                             : 'secondary'
                         }
+                        className="text-xs"
                       >
                         {transaction.type === 'income' ? 'Income' : 'Expense'}
                       </Badge>

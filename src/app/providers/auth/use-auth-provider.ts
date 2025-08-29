@@ -10,7 +10,13 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
 import { auth, db, firestoreCollection } from '@/shared/config/firebase';
 import type { SignUpProps } from './index';
 import { handleFirebaseError } from '@/shared/utils/firebase.ts';
