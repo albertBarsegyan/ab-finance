@@ -21,15 +21,15 @@ export function LanguageSwitcher() {
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center justify-start gap-2 w-fit"
+          className="flex items-center justify-start gap-2 w-full lg:w-fit"
         >
           <Globe className="h-4 w-4 mr-3" />
-          <span className="hidden sm:inline">
+          <span>
             {currentLang?.nativeName || currentLang?.name || 'Language'}
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-full">
         {availableLanguages.map(language => (
           <DropdownMenuItem
             key={language.code}

@@ -1,4 +1,3 @@
-import { Link } from 'lucide-react';
 import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 import { AbFinanceLogo } from '@/shared/components/icons/logo.tsx';
 
@@ -13,26 +12,26 @@ export function FooterSection() {
               © 2024 abFinance. All rights reserved.
             </p>
           </div>
-          <nav className="flex flex-wrap justify-center gap-4 sm:ml-auto sm:gap-6">
-            <Link
-              href="#"
-              className="text-xs hover:underline underline-offset-4 text-gray-600"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="#"
-              className="text-xs hover:underline underline-offset-4 text-gray-600"
-            >
-              Terms of Service
-            </Link>
-            <Link
-              href="#"
-              className="text-xs hover:underline underline-offset-4 text-gray-600"
-            >
-              Support
-            </Link>
-          </nav>
+          {/*<nav className="flex flex-wrap justify-center gap-4 sm:ml-auto sm:gap-6">*/}
+          {/*  <Link*/}
+          {/*    href="#"*/}
+          {/*    className="text-xs hover:underline underline-offset-4 text-gray-600"*/}
+          {/*  >*/}
+          {/*    Privacy Policy*/}
+          {/*  </Link>*/}
+          {/*  <Link*/}
+          {/*    href="#"*/}
+          {/*    className="text-xs hover:underline underline-offset-4 text-gray-600"*/}
+          {/*  >*/}
+          {/*    Terms of Service*/}
+          {/*  </Link>*/}
+          {/*  <Link*/}
+          {/*    href="#"*/}
+          {/*    className="text-xs hover:underline underline-offset-4 text-gray-600"*/}
+          {/*  >*/}
+          {/*    Support*/}
+          {/*  </Link>*/}
+          {/*</nav>*/}
         </div>
       </SectionLayout>
     </footer>

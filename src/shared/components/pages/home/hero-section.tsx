@@ -4,6 +4,7 @@ import { LazyImage } from '@/shared/components/lazy-image';
 import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 
 import pigImage from '@/shared/assets/images/pig-image.jpg';
+import { appPath } from '@/shared/constants/app-path.ts';
 
 export function HeroSection() {
   return (
@@ -25,10 +26,12 @@ export function HeroSection() {
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Button size="lg" className="bg-green-600 hover:bg-green-700">
-                <Star className="mr-2 h-4 w-4" />
-                Get started
-              </Button>
+              <a href={appPath.REGISTER}>
+                <Button size="lg" className="bg-green-600 hover:bg-green-700">
+                  <Star className="mr-2 h-4 w-4" />
+                  Get started
+                </Button>
+              </a>
               {/*<Button variant="outline" size="lg">*/}
               {/*  <Play className="mr-2 h-4 w-4" />*/}
               {/*  Watch Demo*/}
