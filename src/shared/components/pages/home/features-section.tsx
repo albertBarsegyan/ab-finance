@@ -69,7 +69,7 @@ export function FeaturesSection() {
             <CardHeader>
               <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-green-600" />
               <CardTitle className="text-lg sm:text-xl">
-                Bank-Level Security
+                GOOGLE-Level Security
               </CardTitle>
               <CardDescription className="text-sm sm:text-base">
                 Your data is protected with 256-bit encryption and read-only

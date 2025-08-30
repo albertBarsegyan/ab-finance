@@ -15,6 +15,11 @@ export interface Goal {
   goal: string;
   goalCurrency: string;
   goalPrice: string;
+  goalDuration?: {
+    days: number;
+    months: number;
+    years: number;
+  };
   step: number;
   userId: string;
   createdAt: string;

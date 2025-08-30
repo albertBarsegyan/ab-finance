@@ -74,7 +74,23 @@
     "thisPeriod": "This period",
     "loadingChart": "Loading chart...",
     "noDataToDisplay": "No data to display",
-    "exportAllData": "Export All Data"
+    "exportAllData": "Export All Data",
+    "goalProgress": "Goal Progress",
+    "goalAmount": "Goal Amount",
+    "targetAmount": "Target amount",
+    "daysRemaining": "Days Remaining",
+    "untilDeadline": "Until deadline",
+    "dailySpendingNeeded": "Daily Spending Needed",
+    "perDay": "Per day",
+    "goalStatus": "Goal Status",
+    "achievable": "Achievable",
+    "needsAdjustment": "Needs Adjustment",
+    "basedOnProjections": "Based on projections",
+    "projectedFinancials": "Projected Financials",
+    "projectedIncome": "Projected Income",
+    "projectedOutcome": "Projected Outcome",
+    "projectedSavings": "Projected Savings",
+    "untilGoalDeadline": "Until goal deadline"
   },
   "goals": {
     "myGoals": "My Goals",
@@ -85,11 +101,14 @@
     "targetAmount": "Target Amount",
     "currentAmount": "Current Amount",
     "targetDate": "Target Date",
+    "goalDuration": "Goal Duration",
+    "currency": "Currency",
     "description": "Description",
     "enterGoalName": "Enter goal name",
     "enterTargetAmount": "Enter target amount",
     "enterDescription": "Enter description",
     "selectTargetDate": "Select target date",
+    "selectGoalDuration": "Select your target date to achieve your financial goal",
     "goalCreated": "Goal created successfully",
     "goalUpdated": "Goal updated successfully",
     "goalDeleted": "Goal deleted successfully",
@@ -190,7 +209,7 @@
     },
     "cta": {
       "title": "Ready to economy your finances?",
-      "subtitle": "Join over 1 million users who have taken control of their financial future with abFinance.",
+      "subtitle": "Join our users who have taken control of their financial future with abFinance.",
       "getStarted": "Get Started",
       "freeToDownload": "Free to download. No credit card required."
     }

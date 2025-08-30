@@ -2,7 +2,7 @@ import { Badge } from 'lucide-react';
 import { LazyImage } from '@/shared/components/lazy-image';
 import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 
-import pigImage from '@/shared/assets/images/pig-image.jpg';
+import familyImage from '@/shared/assets/images/family-background.png';
 
 export function StatsSection() {
   return (
@@ -57,11 +57,11 @@ export function StatsSection() {
           </div>
           <div className="flex items-center justify-center">
             <LazyImage
-              src={pigImage}
-              width="600"
-              height="400"
+              src={familyImage}
+              width="800"
+              height="800"
               alt="Financial Dashboard"
-              className="w-full max-w-md aspect-video overflow-hidden rounded-xl object-cover shadow-lg"
+              className="w-full overflow-hidden rounded-xl object-cover shadow-lg"
             />
           </div>
         </div>

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -17,11 +16,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
+import {
+  type Duration,
+  DurationPicker,
+} from '@/shared/components/ui/duration-picker';
 import { useAlert } from '@/shared/hooks/alert';
 import { useAuth } from '@/shared/hooks/auth';
 import { useGoalSelection } from '@/app/providers/goal';
 import { currencies } from '@/shared/constants/currencies';
 import { ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { type AddGoalFormData, addGoalSchema } from './schemas';
 
 export type AddGoalModalProps = {
@@ -35,14 +39,12 @@ export function AddGoalModal({
 }: Readonly<AddGoalModalProps>) {
   const { setAlert } = useAlert();
   const { user } = useAuth();
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
+  const { t } = useTranslation();
   const { addGoal } = useGoalSelection();
-
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
     reset,
     setValue,
     watch,
@@ -52,21 +54,28 @@ export function AddGoalModal({
       goal: '',
       goalPrice: '',
       goalCurrency: 'USD',
+      goalDuration: {
+        days: 0,
+        months: 0,
+        years: 0,
+      },
     },
     mode: 'onChange',
   });
 
+  console.log('watch', watch());
+
   const goalCurrency = watch('goalCurrency');
+  const goalDuration = watch('goalDuration');
 
   const onSubmit = async (data: AddGoalFormData) => {
     if (!user?.uid) return;
-
-    setIsSubmitting(true);
 
     const result = await addGoal({
       goal: data.goal.trim(),
       goalPrice: data.goalPrice,
       goalCurrency: data.goalCurrency,
+      goalDuration: data.goalDuration,
       userId: user.uid,
     });
 
@@ -83,20 +92,18 @@ export function AddGoalModal({
         variant: 'destructive',
       });
     }
-
-    setIsSubmitting(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Goal</DialogTitle>
+          <DialogTitle>{t('goals.addNewGoal')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="goalName">Goal Name</Label>
+            <Label htmlFor="goalName">{t('goals.goalName')}</Label>
             <Input
               id="goalName"
               placeholder="e.g., Buy a house, Save for vacation"
@@ -109,7 +116,7 @@ export function AddGoalModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="goalPrice">Target Amount</Label>
+            <Label htmlFor="goalPrice">{t('goals.targetAmount')}</Label>
             <Input
               id="goalPrice"
               type="number"
@@ -123,7 +130,7 @@ export function AddGoalModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="goalCurrency">Currency</Label>
+            <Label htmlFor="goalCurrency">{t('goals.currency')}</Label>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-full justify-between">
@@ -151,6 +158,18 @@ export function AddGoalModal({
             )}
           </div>
 
+          <div className="space-y-2">
+            <DurationPicker
+              value={goalDuration}
+              onChange={(duration: Duration) =>
+                setValue('goalDuration', duration)
+              }
+              error={errors.goalDuration?.message}
+              label={t('goals.goalDuration')}
+              description={t('goals.selectGoalDuration')}
+            />
+          </div>
+
           <DialogFooter>
             <Button
               type="button"
@@ -158,10 +177,10 @@ export function AddGoalModal({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={!isValid || isSubmitting}>
-              {isSubmitting ? 'Creating...' : 'Create Goal'}
+              {isSubmitting ? t('common.saving') : t('goals.addNewGoal')}
             </Button>
           </DialogFooter>
         </form>

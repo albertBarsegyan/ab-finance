@@ -17,10 +17,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
+import {
+  DurationPicker,
+  type Duration,
+} from '@/shared/components/ui/duration-picker';
 import { useAlert } from '@/shared/hooks/alert';
 import { useGoalSelection } from '@/app/providers/goal';
 import { currencies } from '@/shared/constants/currencies';
 import { ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { type EditGoalFormData, editGoalSchema } from './schemas';
 
 export type EditGoalModalProps = {
@@ -35,6 +40,7 @@ export function EditGoalModal({
   goalId,
 }: Readonly<EditGoalModalProps>) {
   const { setAlert } = useAlert();
+  const { t } = useTranslation();
   const { goals, updateGoal, loading } = useGoalSelection();
   const goalToEdit = goalId ? goals.find(g => g.id === goalId) : null;
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -52,6 +58,11 @@ export function EditGoalModal({
       goal: goalToEdit?.goal || '',
       goalPrice: goalToEdit?.goalPrice || '',
       goalCurrency: goalToEdit?.goalCurrency || 'USD',
+      goalDuration: goalToEdit?.goalDuration || {
+        days: 0,
+        months: 0,
+        years: 0,
+      },
     },
     mode: 'onChange',
   });
@@ -62,6 +73,11 @@ export function EditGoalModal({
         goal: goalToEdit.goal,
         goalPrice: goalToEdit.goalPrice,
         goalCurrency: goalToEdit.goalCurrency,
+        goalDuration: goalToEdit.goalDuration || {
+          days: 0,
+          months: 0,
+          years: 0,
+        },
       });
     }
   }, [goalToEdit, open, reset]);
@@ -71,10 +87,19 @@ export function EditGoalModal({
       setValue('goal', goalToEdit.goal);
       setValue('goalPrice', goalToEdit.goalPrice);
       setValue('goalCurrency', goalToEdit.goalCurrency);
+      setValue(
+        'goalDuration',
+        goalToEdit.goalDuration || {
+          days: 0,
+          months: 0,
+          years: 0,
+        }
+      );
     }
   }, [goalToEdit, setValue]);
 
   const goalCurrency = watch('goalCurrency');
+  const goalDuration = watch('goalDuration');
 
   const onSubmit = async (data: EditGoalFormData) => {
     if (!goalToEdit?.id) return;
@@ -84,6 +109,7 @@ export function EditGoalModal({
       goal: data.goal.trim(),
       goalPrice: data.goalPrice,
       goalCurrency: data.goalCurrency,
+      goalDuration: data.goalDuration,
     });
 
     if (result.success) {
@@ -103,17 +129,17 @@ export function EditGoalModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Goal</DialogTitle>
+          <DialogTitle>{t('goals.editGoal')}</DialogTitle>
         </DialogHeader>
 
         {loading || !goalToEdit ? (
           <div className="flex items-center justify-center py-8">
-            <p className="text-muted-foreground">Loading goal data...</p>
+            <p className="text-muted-foreground">{t('common.loading')}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="goalName">Goal Name</Label>
+              <Label htmlFor="goalName">{t('goals.goalName')}</Label>
               <Input
                 id="goalName"
                 placeholder="e.g., Buy a house, Save for vacation"
@@ -126,7 +152,7 @@ export function EditGoalModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="goalPrice">Target Amount</Label>
+              <Label htmlFor="goalPrice">{t('goals.targetAmount')}</Label>
               <Input
                 id="goalPrice"
                 type="number"
@@ -142,7 +168,7 @@ export function EditGoalModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="goalCurrency">Currency</Label>
+              <Label htmlFor="goalCurrency">{t('goals.currency')}</Label>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="w-full justify-between">
@@ -170,6 +196,18 @@ export function EditGoalModal({
               )}
             </div>
 
+            <div className="space-y-2">
+              <DurationPicker
+                value={goalDuration}
+                onChange={(duration: Duration) =>
+                  setValue('goalDuration', duration)
+                }
+                error={errors.goalDuration?.message}
+                label={t('goals.goalDuration')}
+                description={t('goals.selectGoalDuration')}
+              />
+            </div>
+
             <DialogFooter>
               <Button
                 type="button"
@@ -177,10 +215,10 @@ export function EditGoalModal({
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={!isValid || isSubmitting}>
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting ? t('common.saving') : t('common.save')}
               </Button>
             </DialogFooter>
           </form>

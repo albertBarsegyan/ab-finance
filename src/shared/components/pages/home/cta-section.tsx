@@ -15,8 +15,8 @@ export function CTASection() {
               Ready to economy your finances?
             </h2>
             <p className="mx-auto max-w-[600px] text-green-100 text-sm sm:text-base md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Join over 1 million users who have taken control of their
-              financial future with abFinance.
+              Join our users who have taken control of their financial future
+              with abFinance.
             </p>
           </div>
 
@@ -42,7 +42,7 @@ export function CTASection() {
             </div>
             <div className="flex items-center gap-2 text-green-100">
               <CheckCircle className="h-4 w-4" />
-              <span className="text-xs sm:text-sm">Bank-level security</span>
+              <span className="text-xs sm:text-sm">GOOGLE-level security</span>
             </div>
             <div className="flex items-center gap-2 text-green-100">
               <CheckCircle className="h-4 w-4" />

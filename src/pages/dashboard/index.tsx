@@ -118,6 +118,66 @@ export function DashboardPage() {
     exportCombinedToCSV(incomes, outcomes, selectedGoal, currencyCode);
   };
 
+  // Calculate goal-related metrics
+  const goalMetrics = useMemo(() => {
+    if (!selectedGoal) {
+      return {
+        goalAmount: 0,
+        daysRemaining: 0,
+        dailySpendingNeeded: 0,
+        projectedIncome: 0,
+        projectedOutcome: 0,
+        projectedSavings: 0,
+        isGoalAchievable: false,
+      };
+    }
+
+    const goalAmount = parseFloat(selectedGoal.goalPrice) || 0;
+    const goalDuration = selectedGoal.goalDuration || {
+      days: 0,
+      months: 0,
+      years: 0,
+    };
+
+    // Calculate total days remaining
+    const totalDaysRemaining =
+      goalDuration.years * 365 + goalDuration.months * 30 + goalDuration.days;
+
+    // Calculate daily spending needed to reach goal
+    const dailySpendingNeeded =
+      totalDaysRemaining > 0 ? goalAmount / totalDaysRemaining : 0;
+
+    // Calculate projected totals until goal deadline
+    // For now, we'll use current monthly averages and project them
+    const currentMonthlyIncome =
+      monthlySeries.length > 0
+        ? monthlySeries.reduce((sum, month) => sum + month.income, 0) /
+          monthlySeries.length
+        : 0;
+    const currentMonthlyOutcome =
+      monthlySeries.length > 0
+        ? monthlySeries.reduce((sum, month) => sum + month.spendings, 0) /
+          monthlySeries.length
+        : 0;
+
+    const monthsRemaining = Math.max(1, Math.ceil(totalDaysRemaining / 30));
+    const projectedIncome = currentMonthlyIncome * monthsRemaining;
+    const projectedOutcome = currentMonthlyOutcome * monthsRemaining;
+    const projectedSavings = projectedIncome - projectedOutcome;
+
+    const isGoalAchievable = projectedSavings >= goalAmount;
+
+    return {
+      goalAmount,
+      daysRemaining: totalDaysRemaining,
+      dailySpendingNeeded,
+      projectedIncome,
+      projectedOutcome,
+      projectedSavings,
+      isGoalAchievable,
+    };
+  }, [selectedGoal, monthlySeries]);
+
   const financialMetrics = useMemo(
     () => [
       {
@@ -252,6 +312,115 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Goal Progress Section */}
+      {selectedGoal && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold sm:text-lg flex items-center gap-2">
+              {t('dashboard.goalProgress')}
+              {goalMetrics.isGoalAchievable ? (
+                <CheckCircle className="h-5 w-5 text-green-500" />
+              ) : (
+                <AlertTriangle className="h-5 w-5 text-orange-500" />
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              {/* Goal Amount */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm">
+                    {t('dashboard.goalAmount')}
+                  </h3>
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xl font-bold sm:text-2xl">
+                    {formatCurrencyWithDecimals(
+                      goalMetrics.goalAmount,
+                      currencyCode
+                    )}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {t('dashboard.targetAmount')}
+                </div>
+              </div>
+
+              {/* Days Remaining */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm">
+                    {t('dashboard.daysRemaining')}
+                  </h3>
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xl font-bold sm:text-2xl">
+                    {goalMetrics.daysRemaining}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {t('dashboard.untilDeadline')}
+                </div>
+              </div>
+
+              {/* Daily Spending Needed */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm">
+                    {t('dashboard.dailySpendingNeeded')}
+                  </h3>
+                  <AlertTriangle className="h-4 w-4 text-orange-500" />
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xl font-bold sm:text-2xl">
+                    {formatCurrencyWithDecimals(
+                      goalMetrics.dailySpendingNeeded,
+                      currencyCode
+                    )}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {t('dashboard.perDay')}
+                </div>
+              </div>
+
+              {/* Goal Achievability */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm">
+                    {t('dashboard.goalStatus')}
+                  </h3>
+                  {goalMetrics.isGoalAchievable ? (
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <AlertTriangle className="h-4 w-4 text-orange-500" />
+                  )}
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span
+                    className={`text-xl font-bold sm:text-2xl ${
+                      goalMetrics.isGoalAchievable
+                        ? 'text-green-600'
+                        : 'text-orange-600'
+                    }`}
+                  >
+                    {goalMetrics.isGoalAchievable
+                      ? t('dashboard.achievable')
+                      : t('dashboard.needsAdjustment')}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {t('dashboard.basedOnProjections')}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Financial Metrics Grid */}
       <Card>

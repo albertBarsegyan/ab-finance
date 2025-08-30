@@ -3,7 +3,7 @@ import { Badge, Star } from 'lucide-react';
 import { LazyImage } from '@/shared/components/lazy-image';
 import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 
-import pigImage from '@/shared/assets/images/pig-image.jpg';
+import pigImage from '@/shared/assets/images/animals-image.png';
 import { appPath } from '@/shared/constants/app-path.ts';
 
 export function HeroSection() {
@@ -37,15 +37,15 @@ export function HeroSection() {
               {/*  Watch Demo*/}
               {/*</Button>*/}
             </div>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
+            <div className="flex items-center flex-col md:flex-row gap-2 md:gap-4 text-sm text-gray-600">
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-medium">4.8/5</span>
+                <Star className="h-4 w-4 fill-green-500 text-green-500" />
+                <span className="font-medium">Smart Budgeting</span>
               </div>
               <span>{'•'}</span>
-              <span>1M+ downloads</span>
+              <span>Track income & expenses</span>
               <span>{'•'}</span>
-              <span>Bank-level security</span>
+              <span>Set & achieve financial goals</span>
             </div>
           </div>
           <div className="flex items-center justify-center">

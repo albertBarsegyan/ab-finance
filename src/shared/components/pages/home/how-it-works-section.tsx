@@ -20,12 +20,10 @@ export function HowItWorksSection() {
                 1
               </span>
             </div>
-            <h3 className="text-lg font-bold sm:text-xl">
-              Connect Your Accounts
-            </h3>
+            <h3 className="text-lg font-bold sm:text-xl">Add Your Finances</h3>
             <p className="text-gray-600 text-sm sm:text-base">
-              Securely link your bank accounts, credit cards, and investment
-              accounts in seconds.
+              Quickly enter your income and expenses, categorize transactions,
+              and get a clear picture of your financial habits.
             </p>
           </div>
           <div className="flex flex-col items-center space-y-4 text-center">

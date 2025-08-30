@@ -16,6 +16,11 @@ export interface Goal {
   goal: string;
   goalCurrency: string;
   goalPrice: string;
+  goalDuration?: {
+    days: number;
+    months: number;
+    years: number;
+  };
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -33,7 +38,9 @@ interface UseGoalsWithSelectionResult {
   ) => Promise<{ success: boolean; error?: string }>;
   updateGoal: (
     goalId: string,
-    updates: Partial<Pick<Goal, 'goal' | 'goalPrice' | 'goalCurrency'>>
+    updates: Partial<
+      Pick<Goal, 'goal' | 'goalPrice' | 'goalCurrency' | 'goalDuration'>
+    >
   ) => Promise<{ success: boolean; error?: string }>;
   deleteGoal: (goalId: string) => Promise<{ success: boolean; error?: string }>;
 }
@@ -183,7 +190,9 @@ export function useGoalsWithSelection(
 
   const updateGoal = async (
     goalId: string,
-    updates: Partial<Pick<Goal, 'goal' | 'goalPrice' | 'goalCurrency'>>
+    updates: Partial<
+      Pick<Goal, 'goal' | 'goalPrice' | 'goalCurrency' | 'goalDuration'>
+    >
   ): Promise<{ success: boolean; error?: string }> => {
     if (!userId) {
       return { success: false, error: 'User not authenticated' };

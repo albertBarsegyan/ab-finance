@@ -201,7 +201,7 @@ export function RegisterForm() {
                 setValue('acceptTerms', checked as boolean)
               }
             />
-            <Label htmlFor="acceptTerms" className="text-sm">
+            <div className="gap-2 text-sm">
               {t('auth.acceptTerms')}{' '}
               <Link to="/terms" className="text-green-600 hover:text-green-500">
                 {t('auth.termsOfService')}
@@ -213,7 +213,7 @@ export function RegisterForm() {
               >
                 {t('auth.privacyPolicy')}
               </Link>
-            </Label>
+            </div>
           </div>
           {errors.acceptTerms && (
             <p className="text-sm text-red-500">{errors.acceptTerms.message}</p>
