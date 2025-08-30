@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import {
   Card,
@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import { X, Download, WifiOff } from 'lucide-react';
+import { Download, WifiOff, X } from 'lucide-react';
 
 interface PWAUpdateNotificationProps {
   onUpdate: () => void;

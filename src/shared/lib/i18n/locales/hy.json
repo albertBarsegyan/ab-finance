@@ -62,8 +62,8 @@
     "profile": "Պրոֆիլ"
   },
   "dashboard": {
-    "overview": "Ակնարկ",
-    "yourFinancialDashboard": "Ձեր ֆինանսական վահանակի ակնարկը",
+    "overview": "Վահանակի Տվյալներ",
+    "yourFinancialDashboard": "Ձեր ֆինանսական վահանակի տվյալները",
     "goal": "Նպատակ",
     "trend": "ՏՐԵՆԴ (վերջին 6 ամիս)",
     "breakdown": "ԲԱՃԱՐԿՈՒՄ",
