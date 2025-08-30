@@ -21,6 +21,7 @@ import { Checkbox } from '@/shared/components/ui/checkbox';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 import { useAlert } from '@/shared/hooks/alert.tsx';
 import { useTranslation } from 'react-i18next';
+import { GoogleIcon } from '@/shared/components/icons/google-icon.tsx';
 
 export function LoginForm() {
   const { signIn, signInWithGoogle } = useAuth();
@@ -66,9 +67,7 @@ export function LoginForm() {
     <Card>
       <CardHeader>
         <CardTitle>{t('auth.signIn')}</CardTitle>
-        <CardDescription>
-          {t('auth.enterCredentials')}
-        </CardDescription>
+        <CardDescription>{t('auth.enterCredentials')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -164,7 +163,7 @@ export function LoginForm() {
             onClick={onGoogleSignIn}
             disabled={isLoading}
           >
-            {t('auth.continueWithGoogle')}
+            <span> {t('auth.continueWithGoogle')}</span> <GoogleIcon />
           </Button>
         </form>
 

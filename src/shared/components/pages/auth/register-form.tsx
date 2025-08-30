@@ -71,9 +71,7 @@ export function RegisterForm() {
     <Card>
       <CardHeader>
         <CardTitle>{t('auth.signUp')}</CardTitle>
-        <CardDescription>
-          {t('auth.fillDetails')}
-        </CardDescription>
+        <CardDescription>{t('auth.fillDetails')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
