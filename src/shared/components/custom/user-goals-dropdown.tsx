@@ -31,14 +31,16 @@ export function UserGoalsDropdown() {
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="lg:w-full justify-start flex space-x-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900"
+          className="lg:w-full justify-between flex space-x-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900"
         >
-          <Target className="h-3 w-3 sm:h-4 sm:w-4" />
-          <span className="truncate">
-            {selectedGoal ? selectedGoal.goal : 'Select Goal'}
-          </span>
+          <div className="flex items-center space-x-2">
+            <Target className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="truncate">
+              {selectedGoal ? selectedGoal.goal : 'Select Goal'}
+            </span>
+          </div>
           <ChevronDown className="h-3 w-3" />
         </Button>
       </DropdownMenuTrigger>

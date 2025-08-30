@@ -12,7 +12,9 @@ import { useModal } from '@/shared/hooks/modal';
 import { useAuth } from '@/shared/hooks/auth';
 import { useIncomes } from '@/entities/incomes/model/use-incomes';
 import { useGoalSelection } from '@/app/providers/goal';
-import { Car, DollarSign, Heart, Home, Plane, Plus } from 'lucide-react';
+import { formatCurrencyWithDecimals } from '@/shared/lib/currency';
+import { exportIncomesToCSV } from '@/shared/lib/csv-export';
+import { Car, DollarSign, Download, Heart, Home, Plane, Plus } from 'lucide-react';
 
 // Helper function to get icon and color based on income category
 const getIncomeIconAndColor = (category: string) => {
@@ -36,7 +38,7 @@ const getIncomeIconAndColor = (category: string) => {
 export function IncomePage() {
   const { openModal } = useModal();
   const { user } = useAuth();
-  const { selectedGoalId } = useGoalSelection();
+  const { selectedGoalId, selectedGoal } = useGoalSelection();
   const { incomes, loading } = useIncomes(
     user?.uid,
     selectedGoalId || undefined
@@ -69,6 +71,13 @@ export function IncomePage() {
     0
   );
 
+  // Get currency from selected goal, default to USD
+  const currencyCode = selectedGoal?.goalCurrency || 'USD';
+
+  const handleExportIncomes = () => {
+    exportIncomesToCSV(incomes, selectedGoal, currencyCode);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col space-y-4 lg:flex-row sm:items-center sm:justify-between sm:space-y-0">
@@ -81,13 +90,24 @@ export function IncomePage() {
             Track your Income and stay within your budget limits.
           </p>
         </div>
-        <Button
-          onClick={() => openModal('add-income')}
-          className="w-full sm:w-auto"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Create Income
-        </Button>
+        <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+          <Button
+            onClick={handleExportIncomes}
+            variant="outline"
+            className="w-full sm:w-auto"
+            disabled={incomes.length === 0}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
+          <Button
+            onClick={() => openModal('add-income')}
+            className="w-full sm:w-auto"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Create Income
+          </Button>
+        </div>
       </div>
 
       {/* Budget Overview */}
@@ -99,7 +119,7 @@ export function IncomePage() {
           </CardHeader>
           <CardContent>
             <div className="text-xl font-bold sm:text-2xl">
-              ${totalIncome.toFixed(2)}
+              {formatCurrencyWithDecimals(totalIncome, currencyCode)}
             </div>
             <p className="text-xs text-muted-foreground">Total Income</p>
           </CardContent>
@@ -148,7 +168,7 @@ export function IncomePage() {
                       </div>
                       <div className="text-right">
                         <p className="font-medium text-green-600">
-                          ${income.amount.toFixed(2)}
+                          {formatCurrencyWithDecimals(income.amount, currencyCode)}
                         </p>
                         <Badge variant="default" className="text-xs">
                           {income.status}

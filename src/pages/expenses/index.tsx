@@ -12,7 +12,9 @@ import { useModal } from '@/shared/hooks/modal';
 import { useAuth } from '@/shared/hooks/auth';
 import { useOutcomes } from '@/entities/outcomes/model/use-outcomes';
 import { useGoalSelection } from '@/app/providers/goal';
-import { Plus, TrendingDown } from 'lucide-react';
+import { formatCurrencyWithDecimals } from '@/shared/lib/currency';
+import { exportOutcomesToCSV } from '@/shared/lib/csv-export';
+import { Download, Plus, TrendingDown } from 'lucide-react';
 
 // Type for transaction display
 type TransactionDisplay = {
@@ -28,7 +30,7 @@ type TransactionDisplay = {
 export function ExpensesPage() {
   const { openModal } = useModal();
   const { user } = useAuth();
-  const { selectedGoalId } = useGoalSelection();
+  const { selectedGoalId, selectedGoal } = useGoalSelection();
 
   const { outcomes, loading: outcomesLoading } = useOutcomes(
     user?.uid,
@@ -54,6 +56,13 @@ export function ExpensesPage() {
     );
   }, [outcomes]);
 
+  // Get currency from selected goal, default to USD
+  const currencyCode = selectedGoal?.goalCurrency || 'USD';
+
+  const handleExportExpenses = () => {
+    exportOutcomesToCSV(outcomes, selectedGoal, currencyCode);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
@@ -65,7 +74,16 @@ export function ExpensesPage() {
             View and manage your financial expenses.
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+          <Button
+            onClick={handleExportExpenses}
+            variant="outline"
+            className="w-full sm:w-auto"
+            disabled={outcomes.length === 0}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
           <Button
             onClick={() => openModal('add-outcome')}
             className="w-full sm:w-auto"
@@ -87,11 +105,10 @@ export function ExpensesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-xl font-bold text-red-600 sm:text-2xl">
-              $
-              {outcomes
-
-                .reduce((sum, outcome) => sum + Number(outcome.amount || 0), 0)
-                .toFixed(2)}
+              {formatCurrencyWithDecimals(
+                outcomes.reduce((sum, outcome) => sum + Number(outcome.amount || 0), 0),
+                currencyCode
+              )}
             </div>
             <p className="text-xs text-muted-foreground">Total</p>
           </CardContent>
@@ -169,8 +186,8 @@ export function ExpensesPage() {
                             : 'text-red-600'
                         }`}
                       >
-                        {transaction.type === 'income' ? '+' : ''}$
-                        {Math.abs(transaction.amount).toFixed(2)}
+                        {transaction.type === 'income' ? '+' : ''}
+                        {formatCurrencyWithDecimals(Math.abs(transaction.amount), currencyCode)}
                       </span>
                     </div>
                   </div>

@@ -21,9 +21,11 @@ import { Checkbox } from '@/shared/components/ui/checkbox';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 import { useAlert } from '@/shared/hooks/alert.tsx';
 import { GoogleIcon } from '@/shared/components/icons/google-icon.tsx';
+import { useTranslation } from 'react-i18next';
 
 export function RegisterForm() {
   const { setAlert } = useAlert();
+  const { t } = useTranslation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -68,22 +70,22 @@ export function RegisterForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sign up</CardTitle>
+        <CardTitle>{t('auth.signUp')}</CardTitle>
         <CardDescription>
-          Fill in your details to create your account
+          {t('auth.fillDetails')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="firstName">{t('auth.firstName')}</Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="firstName"
                   type="text"
-                  placeholder="First name"
+                  placeholder={t('auth.first_name')}
                   className={`pl-10 ${errors.firstName ? 'border-red-500' : ''}`}
                   {...register('firstName')}
                 />
@@ -95,13 +97,13 @@ export function RegisterForm() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="lastName">{t('auth.lastName')}</Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="lastName"
                   type="text"
-                  placeholder="Last name"
+                  placeholder={t('auth.last_name')}
                   className={`pl-10 ${errors.lastName ? 'border-red-500' : ''}`}
                   {...register('lastName')}
                 />
@@ -115,13 +117,13 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('auth.enterEmail')}
                 className={`pl-10 ${errors.email ? 'border-red-500' : ''}`}
                 {...register('email')}
               />
@@ -132,13 +134,13 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Create a password"
+                placeholder={t('auth.createPassword')}
                 className={`pl-10 pr-10 ${errors.password ? 'border-red-500' : ''}`}
                 {...register('password')}
               />
@@ -162,13 +164,13 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Confirm your password"
+                placeholder={t('auth.confirmYourPassword')}
                 className={`pl-10 pr-10 ${errors.confirmPassword ? 'border-red-500' : ''}`}
                 {...register('confirmPassword')}
               />
@@ -202,16 +204,16 @@ export function RegisterForm() {
               }
             />
             <Label htmlFor="acceptTerms" className="text-sm">
-              I agree to the{' '}
+              {t('auth.acceptTerms')}{' '}
               <Link to="/terms" className="text-green-600 hover:text-green-500">
-                Terms of Service
+                {t('auth.termsOfService')}
               </Link>{' '}
               and{' '}
               <Link
                 to="/privacy"
                 className="text-green-600 hover:text-green-500"
               >
-                Privacy Policy
+                {t('auth.privacyPolicy')}
               </Link>
             </Label>
           </div>
@@ -224,7 +226,7 @@ export function RegisterForm() {
             className="w-full bg-green-600 hover:bg-green-700"
             disabled={isLoading}
           >
-            {isLoading ? 'Creating Account...' : 'Create Account'}
+            {isLoading ? t('auth.creatingAccount') : t('auth.signUp')}
           </Button>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -232,7 +234,7 @@ export function RegisterForm() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-white px-2 text-muted-foreground">
-                Or continue with
+                {t('auth.orContinueWith')}
               </span>
             </div>
           </div>
@@ -243,18 +245,18 @@ export function RegisterForm() {
             onClick={onGoogleSignUp}
             disabled={isLoading}
           >
-            <span> Continue with Google</span> <GoogleIcon />
+            <span> {t('auth.continueWithGoogle')}</span> <GoogleIcon />
           </Button>
         </form>
 
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Already have an account?{' '}
+            {t('auth.alreadyHaveAccount')}{' '}
             <Link
               to="/login"
               className="font-medium text-green-600 hover:text-green-500"
             >
-              Sign in
+              {t('auth.signIn')}
             </Link>
           </p>
         </div>

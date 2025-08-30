@@ -3,6 +3,9 @@ import { useAuth } from '@/shared/hooks/auth';
 import { useGoalSelection } from '@/app/providers/goal';
 import { useIncomes } from '@/entities/incomes/model/use-incomes';
 import { useOutcomes } from '@/entities/outcomes/model/use-outcomes';
+import { formatCurrencyWithDecimals, getCurrencySymbol } from '@/shared/lib/currency';
+import { exportCombinedToCSV } from '@/shared/lib/csv-export';
+import { useTranslation } from 'react-i18next';
 
 import {
   Card,
@@ -12,7 +15,7 @@ import {
 } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Progress } from '@/shared/components/ui/progress';
-import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Download, Info } from 'lucide-react';
 
 // Recharts
 import {
@@ -32,6 +35,7 @@ import {
 export function DashboardPage() {
   const { user } = useAuth();
   const { selectedGoal } = useGoalSelection();
+  const { t } = useTranslation();
 
   const { incomes, loading: incomesLoading } = useIncomes(
     user?.uid,
@@ -103,43 +107,51 @@ export function DashboardPage() {
 
   const loading = incomesLoading || outcomesLoading;
 
+  // Get currency from selected goal, default to USD
+  const currencyCode = selectedGoal?.goalCurrency || 'USD';
+  const currencySymbol = getCurrencySymbol(currencyCode);
+
+  const handleExportCombined = () => {
+    exportCombinedToCSV(incomes, outcomes, selectedGoal, currencyCode);
+  };
+
   const financialMetrics = useMemo(
     () => [
       {
-        name: 'INCOME',
+        name: t('dashboard.income'),
         currentValue: totalIncome,
-        unit: selectedGoal ? '' : '',
+        unit: currencySymbol,
         goalProgress: 0,
         goalValue: '',
       },
       {
-        name: 'SPENDINGS',
+        name: t('dashboard.spendings'),
         currentValue: totalOutcome,
-        unit: selectedGoal ? '' : '',
+        unit: currencySymbol,
         goalProgress: 0,
         goalValue: '',
       },
       {
-        name: 'SAVINGS',
+        name: t('dashboard.savings'),
         currentValue: savingsTotal,
-        unit: selectedGoal ? '' : '',
+        unit: currencySymbol,
         goalProgress: 0,
         goalValue: '',
       },
     ],
-    [totalIncome, totalOutcome, savingsTotal, selectedGoal]
+    [totalIncome, totalOutcome, savingsTotal, currencySymbol, t]
   );
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Overview
+          {t('dashboard.overview')}
         </h1>
         <p className="text-muted-foreground">
           {selectedGoal
-            ? `Goal: ${selectedGoal.goal}`
-            : 'Your financial dashboard overview'}
+            ? `${t('dashboard.goal')}: ${selectedGoal.goal}`
+            : t('dashboard.yourFinancialDashboard')}
         </p>
       </div>
 
@@ -149,7 +161,7 @@ export function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base font-semibold sm:text-lg flex items-center gap-2">
-              TREND (last 6 months)
+              {t('dashboard.trend')}
               <Info className="h-4 w-4 text-muted-foreground" />
             </CardTitle>
           </CardHeader>
@@ -157,11 +169,11 @@ export function DashboardPage() {
             <div className="h-[250px] sm:h-[300px]">
               {loading ? (
                 <div className="h-full flex items-center justify-center text-muted-foreground">
-                  Loading chart...
+                  {t('dashboard.loadingChart')}
                 </div>
               ) : monthlySeries.length === 0 ? (
                 <div className="h-full flex items-center justify-center text-muted-foreground">
-                  No data to display
+                  {t('dashboard.noDataToDisplay')}
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
@@ -206,14 +218,14 @@ export function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base font-semibold sm:text-lg">
-              BREAKDOWN
+              {t('dashboard.breakdown')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[250px] sm:h-[300px]">
               {loading ? (
                 <div className="h-full flex items-center justify-center text-muted-foreground">
-                  Loading chart...
+                  {t('dashboard.loadingChart')}
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
@@ -242,7 +254,7 @@ export function DashboardPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base font-semibold sm:text-lg">
-            Financial Metrics
+            {t('dashboard.financialMetrics')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -261,18 +273,15 @@ export function DashboardPage() {
 
                 <div className="flex items-baseline gap-1">
                   <span className="text-xl font-bold sm:text-2xl">
-                    {metric.currentValue.toLocaleString()}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {metric.unit}
+                    {formatCurrencyWithDecimals(metric.currentValue, currencyCode)}
                   </span>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">This period</span>
+                    <span className="text-muted-foreground">{t('dashboard.thisPeriod')}</span>
                     <span className="text-muted-foreground">
-                      {selectedGoal?.goalCurrency || 'USD'}
+                      {currencyCode} ({currencySymbol})
                     </span>
                   </div>
 
@@ -288,8 +297,15 @@ export function DashboardPage() {
 
       {/* Actions */}
       <div className="flex gap-2">
-        <Button variant="outline" size="sm" className="w-full sm:w-auto">
-          Export
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full sm:w-auto"
+          onClick={handleExportCombined}
+          disabled={incomes.length === 0 && outcomes.length === 0}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          {t('dashboard.exportAllData')}
         </Button>
       </div>
     </div>

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   FirestoreError,
   onSnapshot,
   query,
@@ -26,6 +28,7 @@ interface UseUserGoalsResult {
   addGoal: (
     goalData: Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>
   ) => Promise<{ success: boolean; error?: string }>;
+  deleteGoal: (goalId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 export function useGoals(userId: string | undefined): UseUserGoalsResult {
@@ -109,5 +112,29 @@ export function useGoals(userId: string | undefined): UseUserGoalsResult {
     }
   };
 
-  return { goals, loading, error, addGoal };
+  const deleteGoal = async (
+    goalId: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+      const goalRef = doc(
+        db,
+        firestoreCollection.USERS,
+        userId,
+        firestoreCollection.GOALS,
+        goalId
+      );
+
+      await deleteDoc(goalRef);
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting goal:', error);
+      return { success: false, error: 'Failed to delete goal' };
+    }
+  };
+
+  return { goals, loading, error, addGoal, deleteGoal };
 }

@@ -15,6 +15,7 @@ import { useAuth } from '@/shared/hooks/auth';
 import { useAlert } from '@/shared/hooks/alert';
 import { useIncomes } from '@/entities/incomes/model/use-incomes';
 import { useGoalSelection } from '@/app/providers/goal';
+import { getCurrencySymbol } from '@/shared/lib/currency';
 import { type AddIncomeFormData, addIncomeSchema } from './schemas';
 
 export type AddIncomeModalProps = {
@@ -28,10 +29,15 @@ export function AddIncomeModal({
 }: Readonly<AddIncomeModalProps>) {
   const { user } = useAuth();
   const { setAlert } = useAlert();
-  const { selectedGoalId } = useGoalSelection();
+  const { selectedGoalId, selectedGoal } = useGoalSelection();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   console.log({ selectedGoalId });
   const { addIncome } = useIncomes(user?.uid, selectedGoalId || undefined);
+
+  // Get currency symbol from selected goal
+  const currencySymbol = selectedGoal
+    ? getCurrencySymbol(selectedGoal.goalCurrency)
+    : '$';
 
   const {
     register,
@@ -74,11 +80,16 @@ export function AddIncomeModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Income</DialogTitle>
+          {selectedGoal && (
+            <p className="text-sm text-muted-foreground">
+              For goal: {selectedGoal.goal} ({currencySymbol})
+            </p>
+          )}
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+            <Label htmlFor="amount">Amount ({currencySymbol})</Label>
             <Input
               id="amount"
               type="number"

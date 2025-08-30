@@ -12,10 +12,12 @@ import { useAuth } from '@/shared/hooks/auth';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db, firestoreCollection } from '@/shared/config/firebase.ts';
 import { PriceStep } from '@/entities/questions/ui/price-step.tsx';
+import { useTranslation } from 'react-i18next';
 
 export default function QuestionsPage() {
   const { user, initializing, fetchUserDocument } = useAuth();
   const { setAlert } = useAlert();
+  const { t } = useTranslation();
 
   const [state, dispatch] = useReducer(questionsReducer, initialQuestionsState);
 
@@ -41,9 +43,9 @@ export default function QuestionsPage() {
     return (
       <QuestionsLayout>
         <div className="text-center py-8">
-          <h2 className="text-2xl font-semibold mb-4">Loading...</h2>
+          <h2 className="text-2xl font-semibold mb-4">{t('questions.loading')}</h2>
           <p className="text-muted-foreground">
-            Please wait while we verify your authentication...
+            {t('questions.pleaseWait')}
           </p>
         </div>
       </QuestionsLayout>

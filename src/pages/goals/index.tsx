@@ -26,6 +26,11 @@ import { useGoalSelection } from '@/app/providers/goal';
 import { useAuth } from '@/shared/hooks/auth';
 import { useIncomes } from '@/entities/incomes/model/use-incomes';
 import { useOutcomes } from '@/entities/outcomes/model/use-outcomes';
+import {
+  formatCurrencyWithDecimals,
+  getCurrencySymbol,
+} from '@/shared/lib/currency';
+import { useTranslation } from 'react-i18next';
 
 // Helper function to get icon and color based on goal name
 const getGoalIconAndColor = (goalName: string) => {
@@ -55,8 +60,8 @@ export function GoalsPage() {
   const { user } = useAuth();
   const { incomes } = useIncomes(user?.uid);
   const { outcomes } = useOutcomes(user?.uid);
-  console.log({ goals });
-  // Transform goals data for display
+  const { t } = useTranslation();
+
   const displayGoals = useMemo(() => {
     return goals.map(goal => {
       const { icon, color } = getGoalIconAndColor(goal.goal);
@@ -76,7 +81,7 @@ export function GoalsPage() {
       return {
         id: goal.id,
         name: goal.goal,
-        description: `Target: ${goal.goalCurrency} ${goal.goalPrice}`,
+        description: `Target: ${formatCurrencyWithDecimals(targetAmount, goal.goalCurrency)}`,
         target: targetAmount,
         current: currentAmount,
         icon,
@@ -84,15 +89,11 @@ export function GoalsPage() {
         status,
         progress: Math.min(100, progress),
         currency: goal.goalCurrency,
+        currencySymbol: getCurrencySymbol(goal.goalCurrency),
       };
     });
   }, [goals, incomes, outcomes]);
 
-  const totalTarget = displayGoals.reduce((sum, goal) => sum + goal.target, 0);
-  const totalCurrent = displayGoals.reduce(
-    (sum, goal) => sum + goal.current,
-    0
-  );
   const completedGoals = displayGoals.filter(
     goal => goal.status === 'completed'
   ).length;
@@ -102,7 +103,7 @@ export function GoalsPage() {
       <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div>
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Financial Goals
+            {t('goals.myGoals')}
           </h1>
           <p className="text-muted-foreground">
             Set and track your financial goals to achieve your dreams.
@@ -113,7 +114,7 @@ export function GoalsPage() {
           className="w-full sm:w-auto"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Create Goal
+          {t('goals.addNewGoal')}
         </Button>
       </div>
 
@@ -121,46 +122,7 @@ export function GoalsPage() {
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Target</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold sm:text-2xl">
-              ${totalTarget.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">Across all goals</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Saved</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold sm:text-2xl">
-              ${totalCurrent.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">Across all goals</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Progress</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold sm:text-2xl">
-              {((totalCurrent / totalTarget) * 100).toFixed(1)}%
-            </div>
-            <p className="text-xs text-muted-foreground">Overall progress</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('goals.completed')}</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -222,7 +184,7 @@ export function GoalsPage() {
                         variant={isCompleted ? 'default' : 'secondary'}
                         className="text-xs"
                       >
-                        {isCompleted ? 'Completed' : 'In Progress'}
+                        {isCompleted ? t('goals.completed') : t('goals.inProgress')}
                       </Badge>
                     </div>
                   </div>
@@ -236,20 +198,31 @@ export function GoalsPage() {
                           {progress.toFixed(1)}%
                         </span>
                       </div>
+
                       <Progress value={progress} className="w-full" />
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <span className="truncate">
-                          ${goal.current.toLocaleString()} saved
+                          {formatCurrencyWithDecimals(
+                            goal.current,
+                            goal.currency
+                          )}{' '}
+                          saved
                         </span>
                         <span className="truncate">
-                          ${goal.target.toLocaleString()} target
+                          {formatCurrencyWithDecimals(
+                            goal.target,
+                            goal.currency
+                          )}{' '}
+                          target
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Currency:</span>
-                      <span className="font-medium">{goal.currency}</span>
+                      <span className="font-medium">
+                        {goal.currency} ({goal.currencySymbol})
+                      </span>
                     </div>
 
                     {!isCompleted && (
@@ -258,12 +231,25 @@ export function GoalsPage() {
                           Remaining:
                         </span>
                         <span className="font-medium">
-                          ${(goal.target - goal.current).toLocaleString()}
+                          {formatCurrencyWithDecimals(
+                            goal.target - goal.current,
+                            goal.currency
+                          )}
                         </span>
                       </div>
                     )}
 
                     <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          openModal('delete-goal', { goalId: goal.id });
+                        }}
+                      >
+                        Delete Goal
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

@@ -1,0 +1,28 @@
+{
+  "name": "Finance Management App",
+  "short_name": "FinanceApp",
+  "description": "A modern finance management application for tracking income, expenses, and financial goals",
+  "theme_color": "#10B981",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["finance", "productivity", "utilities"],
+  "lang": "en",
+  "dir": "ltr"
+}

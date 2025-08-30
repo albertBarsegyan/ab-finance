@@ -8,20 +8,21 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card.tsx';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const GOAL_VARIANTS = [
-  { key: 'emergency', label: '🛡️ Build an Emergency Fund' },
-  { key: 'debt', label: '💳 Pay Off Debt' },
-  { key: 'car', label: '🚗 Save for a Car' },
-  { key: 'house', label: '🏡 Save for a House' },
-  { key: 'education', label: '🎓 Education / Skill Development' },
-  { key: 'wedding', label: '💍 Wedding Savings' },
-  { key: 'travel', label: '✈️ Travel Fund' },
-  { key: 'retirement', label: '🌅 Retirement Savings' },
-  { key: 'health', label: '💊 Health & Medical Fund' },
-  { key: 'business', label: '💼 Start a Business' },
-  { key: 'child', label: '🧸 Child / Family Planning' },
-  { key: 'investment', label: '📈 Investments & Wealth Growth' },
+  { key: 'emergency', labelKey: 'questions.emergencyFund' },
+  { key: 'debt', labelKey: 'questions.payOffDebt' },
+  { key: 'car', labelKey: 'questions.saveForCar' },
+  { key: 'house', labelKey: 'questions.saveForHouse' },
+  { key: 'education', labelKey: 'questions.education' },
+  { key: 'wedding', labelKey: 'questions.wedding' },
+  { key: 'travel', labelKey: 'questions.travel' },
+  { key: 'retirement', labelKey: 'questions.retirement' },
+  { key: 'health', labelKey: 'questions.health' },
+  { key: 'business', labelKey: 'questions.business' },
+  { key: 'child', labelKey: 'questions.child' },
+  { key: 'investment', labelKey: 'questions.investment' },
 ];
 
 type Props = {
@@ -31,6 +32,7 @@ type Props = {
 };
 
 export function GoalStep({ goal, setGoal, onNext }: Props) {
+  const { t } = useTranslation();
   const [customGoal, setCustomGoal] = useState('');
 
   const handleGoalSelect = (key: string) => {
@@ -42,7 +44,7 @@ export function GoalStep({ goal, setGoal, onNext }: Props) {
     <>
       <CardHeader>
         <CardTitle>
-          1. Please tell about your goal, or choose one of them
+          {t('questions.step1')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -55,12 +57,12 @@ export function GoalStep({ goal, setGoal, onNext }: Props) {
               onClick={() => handleGoalSelect(variant.key)}
               className="w-full"
             >
-              {variant.label}
+              {t(variant.labelKey)}
             </Button>
           ))}
 
           <div className="mt-2">
-            <Label htmlFor="custom-goal">Other goal</Label>
+            <Label htmlFor="custom-goal">{t('questions.otherGoal')}</Label>
             <Input
               id="custom-goal"
               value={customGoal}
@@ -68,7 +70,7 @@ export function GoalStep({ goal, setGoal, onNext }: Props) {
                 setCustomGoal(e.target.value);
                 setGoal(e.target.value);
               }}
-              placeholder="Enter your goal..."
+              placeholder={t('questions.enterYourGoal')}
               className="mt-1"
               required
             />
@@ -82,7 +84,7 @@ export function GoalStep({ goal, setGoal, onNext }: Props) {
           onClick={onNext}
           disabled={!goal}
         >
-          Next
+          {t('common.next')}
         </Button>
       </CardFooter>
     </>

@@ -28,14 +28,14 @@ export function CustomAlert({
   return (
     <Alert
       variant={variant}
-      className="top-4 absolute flex items-center w-fit left-2 right-2 lg:top-10 lg:right-10 lg:left-auto z-50"
+      className="top-4 fixed flex items-center w-fit left-2 right-2 lg:top-10 lg:right-10 lg:left-auto z-50"
     >
       <AlertDescription className="flex items-center gap-4 pr-4">
         {iconMapper[variant]} {message}
       </AlertDescription>
       <button
         onClick={onClose}
-        className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        className="rounded-sm ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
       >
         <X className="h-4 w-4 " />
       </button>

@@ -20,10 +20,12 @@ import {
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 import { useAlert } from '@/shared/hooks/alert.tsx';
+import { useTranslation } from 'react-i18next';
 
 export function LoginForm() {
   const { signIn, signInWithGoogle } = useAuth();
   const { setAlert } = useAlert();
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,21 +65,21 @@ export function LoginForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sign in</CardTitle>
+        <CardTitle>{t('auth.signIn')}</CardTitle>
         <CardDescription>
-          Enter your credentials to access your account
+          {t('auth.enterCredentials')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('auth.enterEmail')}
                 className={`pl-10 ${errors.email ? 'border-red-500' : ''}`}
                 {...register('email')}
               />
@@ -88,13 +90,13 @@ export function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Enter your password"
+                placeholder={t('auth.enterPassword')}
                 className={`pl-10 pr-10 ${errors.password ? 'border-red-500' : ''}`}
                 {...register('password')}
               />
@@ -127,14 +129,14 @@ export function LoginForm() {
                 }
               />
               <Label htmlFor="rememberMe" className="text-sm">
-                Remember me
+                {t('auth.rememberMe')}
               </Label>
             </div>
             <Link
               to="/forgot-password"
               className="text-sm text-green-600 hover:text-green-500"
             >
-              Forgot password?
+              {t('auth.forgotPassword')}
             </Link>
           </div>
 
@@ -143,7 +145,7 @@ export function LoginForm() {
             className="w-full bg-green-600 hover:bg-green-700"
             disabled={isLoading}
           >
-            {isLoading ? 'Signing in...' : 'Sign in'}
+            {isLoading ? t('auth.signingIn') : t('auth.signIn')}
           </Button>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -151,7 +153,7 @@ export function LoginForm() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-white px-2 text-muted-foreground">
-                Or continue with
+                {t('auth.orContinueWith')}
               </span>
             </div>
           </div>
@@ -162,18 +164,18 @@ export function LoginForm() {
             onClick={onGoogleSignIn}
             disabled={isLoading}
           >
-            Continue with Google
+            {t('auth.continueWithGoogle')}
           </Button>
         </form>
 
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
+            {t('auth.dontHaveAccount')}{' '}
             <Link
               to="/register"
               className="font-medium text-green-600 hover:text-green-500"
             >
-              Sign up
+              {t('auth.signUp')}
             </Link>
           </p>
         </div>

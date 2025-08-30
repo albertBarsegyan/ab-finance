@@ -3,6 +3,7 @@ import { AddOutcomeModal } from '@/features/outcomes/add-outcome-modal.tsx';
 import { AddGoalModal } from '@/features/goals/add-goal-modal.tsx';
 import { EditGoalModal } from '@/features/goals/edit-goal-modal.tsx';
 import { useModal } from '@/shared/hooks/modal';
+import { DeleteGoalModal } from '@/features/goals/delete-goal-modal.tsx';
 
 export function GlobalModals() {
   const { isOpen, modalId, closeModal, payload } = useModal();
@@ -44,6 +45,17 @@ export function GlobalModals() {
       case 'edit-goal':
         return (
           <EditGoalModal
+            open={isOpen}
+            onOpenChange={open => {
+              if (!open) closeModal();
+            }}
+            goalId={typedPayload?.goalId}
+          />
+        );
+
+      case 'delete-goal':
+        return (
+          <DeleteGoalModal
             open={isOpen}
             onOpenChange={open => {
               if (!open) closeModal();

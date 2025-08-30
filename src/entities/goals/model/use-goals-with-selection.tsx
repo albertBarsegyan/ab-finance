@@ -2,7 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   FirestoreError,
+  getDoc,
   onSnapshot,
   query,
 } from 'firebase/firestore';
@@ -32,6 +35,7 @@ interface UseGoalsWithSelectionResult {
     goalId: string,
     updates: Partial<Pick<Goal, 'goal' | 'goalPrice' | 'goalCurrency'>>
   ) => Promise<{ success: boolean; error?: string }>;
+  deleteGoal: (goalId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const SELECTED_GOAL_STORAGE_KEY = 'selectedGoalId';
@@ -159,10 +163,20 @@ export function useGoalsWithSelection(
         updatedAt: new Date().toISOString(),
       };
 
-      await addDoc(goalsRef, newGoal);
+      const addedGoalRef = await addDoc(goalsRef, newGoal);
+      const addedGoalSnap = await getDoc(addedGoalRef);
+
+      if (addedGoalSnap.exists()) {
+        const addedGoalData = {
+          id: addedGoalSnap.id,
+          ...addedGoalSnap.data(),
+        } as Goal;
+
+        setSelectedGoal(addedGoalData);
+      }
+
       return { success: true };
-    } catch (error) {
-      console.error('Error adding goal:', error);
+    } catch {
       return { success: false, error: 'Failed to add goal' };
     }
   };
@@ -197,6 +211,37 @@ export function useGoalsWithSelection(
     }
   };
 
+  const deleteGoal = async (
+    goalId: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    try {
+      const goalRef = doc(
+        db,
+        firestoreCollection.USERS,
+        userId,
+        firestoreCollection.GOALS,
+        goalId
+      );
+
+      await deleteDoc(goalRef);
+
+      // If the deleted goal was selected, clear the selection
+      if (selectedGoal?.id === goalId) {
+        setSelectedGoal(null);
+        localStorage.removeItem(SELECTED_GOAL_STORAGE_KEY);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting goal:', error);
+      return { success: false, error: 'Failed to delete goal' };
+    }
+  };
+
   return {
     goals,
     loading,
@@ -206,5 +251,6 @@ export function useGoalsWithSelection(
     setSelectedGoal,
     addGoal,
     updateGoal,
+    deleteGoal,
   };
 }

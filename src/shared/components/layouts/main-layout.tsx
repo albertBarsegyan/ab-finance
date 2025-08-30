@@ -26,19 +26,22 @@ import { appPath } from '@/shared/constants/app-path.ts';
 import { AbFinanceLogo } from '@/shared/components/icons/logo.tsx';
 import { UserGoalsDropdown } from '@/shared/components/custom/user-goals-dropdown.tsx';
 import { BackgroundImageModal } from '@/shared/components/custom/background-image-modal.tsx';
+import { LanguageSwitcher } from '@/shared/components/custom/language-switcher';
+import { useTranslation } from 'react-i18next';
 
 const navigation = [
-  { name: 'Overview', href: appPath.MAIN_PATH, icon: Home },
-  { name: 'Income', href: appPath.INCOME, icon: PiggyBank },
-  { name: 'Expense', href: appPath.EXPENSE, icon: CreditCard },
-  { name: 'Goals', href: appPath.GOALS, icon: Target },
-  { name: 'Profile', href: appPath.PROFILE, icon: User },
+  { nameKey: 'navigation.dashboard', href: appPath.MAIN_PATH, icon: Home },
+  { nameKey: 'navigation.income', href: appPath.INCOME, icon: PiggyBank },
+  { nameKey: 'navigation.expenses', href: appPath.EXPENSE, icon: CreditCard },
+  { nameKey: 'navigation.goals', href: appPath.GOALS, icon: Target },
+  { nameKey: 'navigation.profile', href: appPath.PROFILE, icon: User },
 ];
 
 export function MainLayout() {
   const { signOut } = useAuth();
   const { setAlert } = useAlert();
   const { backgroundImage, updateBackgroundImage } = useBackgroundImage();
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const [backgroundModalOpen, setBackgroundModalOpen] = useState(false);
@@ -63,7 +66,7 @@ export function MainLayout() {
       }}
     >
       {/* Mobile Header */}
-      <div className="lg:hidden bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+      <div className="lg:hidden bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
@@ -74,6 +77,7 @@ export function MainLayout() {
 
             <div className="flex items-center space-x-2">
               <UserGoalsDropdown />
+              <LanguageSwitcher />
               <Button
                 variant="ghost"
                 size="sm"
@@ -104,7 +108,7 @@ export function MainLayout() {
           className="fixed inset-0 bg-gray-600/50"
           onClick={() => setSidebarOpen(false)}
         />
-        <div className="fixed inset-y-0 left-0 flex w-full lg:w-64 flex-col bg-white/95 backdrop-blur-sm">
+        <div className="fixed inset-y-0 left-0 flex w-full lg:w-64 flex-col bg-white/90 backdrop-blur-sm">
           <div className="flex h-16 items-center justify-between px-4">
             <h1 className="text-xl font-bold text-gray-900">
               <AbFinanceLogo />
@@ -126,7 +130,7 @@ export function MainLayout() {
               const isActive = location.pathname === item.href;
               return (
                 <Link
-                  key={item.name}
+                  key={item.nameKey}
                   to={item.href}
                   className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                     isActive
@@ -136,13 +140,14 @@ export function MainLayout() {
                   onClick={() => setSidebarOpen(false)}
                 >
                   <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
+                  {t(item.nameKey)}
                 </Link>
               );
             })}
           </nav>
 
           <div className="border-t border-gray-200 p-4 space-y-2">
+            <LanguageSwitcher />
             <Button
               onClick={() => setBackgroundModalOpen(true)}
               variant="outline"
@@ -157,7 +162,7 @@ export function MainLayout() {
               className="w-full justify-start"
             >
               <LogOut className="mr-3 h-5 w-5" />
-              Sign Out
+              {t('auth.signOut')}
             </Button>
           </div>
         </div>
@@ -165,7 +170,7 @@ export function MainLayout() {
 
       {/* Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col z-10">
-        <div className="flex flex-col flex-grow bg-white/95 backdrop-blur-sm border-r border-gray-200">
+        <div className="flex flex-col flex-grow bg-white/90 backdrop-blur-sm border-r border-gray-200">
           <div className="flex items-center h-16 px-4">
             <Link to={appPath.MAIN_PATH} className="flex items-center">
               <AbFinanceLogo />
@@ -179,7 +184,7 @@ export function MainLayout() {
               const isActive = location.pathname === item.href;
               return (
                 <Link
-                  key={item.name}
+                  key={item.nameKey}
                   to={item.href}
                   className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                     isActive
@@ -188,13 +193,14 @@ export function MainLayout() {
                   }`}
                 >
                   <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
+                  {t(item.nameKey)}
                 </Link>
               );
             })}
           </nav>
 
           <div className="border-t border-gray-200 p-4 space-y-2">
+            <LanguageSwitcher />
             <Button
               onClick={() => setBackgroundModalOpen(true)}
               variant="outline"
@@ -209,7 +215,7 @@ export function MainLayout() {
               className="w-full justify-start"
             >
               <LogOut className="mr-3 h-5 w-5" />
-              Sign Out
+              {t('auth.signOut')}
             </Button>
           </div>
         </div>
@@ -228,10 +234,10 @@ export function MainLayout() {
                 variant="outline"
                 onClick={() => setLogoutDialogOpen(false)}
               >
-                No
+                {t('common.no')}
               </Button>
               <Button variant="destructive" onClick={handleSignOut}>
-                Yes
+                {t('common.yes')}
               </Button>
             </DialogFooter>
           </DialogContent>

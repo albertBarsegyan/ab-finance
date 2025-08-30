@@ -14,7 +14,16 @@ import {
   AvatarImage,
 } from '@/shared/components/ui/avatar';
 import { Badge } from '@/shared/components/ui/badge';
-import { Calendar, Edit, Image, Mail, MapPin, Save, User, X } from 'lucide-react';
+import {
+  Calendar,
+  Edit,
+  Image,
+  Mail,
+  MapPin,
+  Save,
+  User,
+  X,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/shared/hooks/auth.tsx';
 import { useAlert } from '@/shared/hooks/alert.tsx';
@@ -65,7 +74,9 @@ export function ProfilePage() {
     <div className="space-y-6">
       <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Profile</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Profile
+          </h1>
           <p className="text-muted-foreground">
             Manage your account settings and preferences.
           </p>
@@ -308,7 +319,9 @@ export function ProfilePage() {
         <CardContent>
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             <div className="text-center">
-              <div className="text-xl font-bold sm:text-2xl">{totalTransactions}</div>
+              <div className="text-xl font-bold sm:text-2xl">
+                {totalTransactions}
+              </div>
               <div className="text-sm text-muted-foreground">
                 Total Transactions
               </div>

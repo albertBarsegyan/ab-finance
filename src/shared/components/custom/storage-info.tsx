@@ -1,8 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { useEffect, useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 import { Progress } from '@/shared/components/ui/progress';
 import { Button } from '@/shared/components/ui/button';
-import { HardDrive, Trash2, RefreshCw } from 'lucide-react';
+import { HardDrive, RefreshCw, Trash2 } from 'lucide-react';
 import { storageManager } from '@/shared/utils/storage';
 import { useBackgroundImage } from '@/shared/hooks/background-image';
 
@@ -60,7 +66,9 @@ export function StorageInfo() {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span>Storage Usage</span>
-            <span>{formatBytes(storageSize)} / {formatBytes(availableSpace)}</span>
+            <span>
+              {formatBytes(storageSize)} / {formatBytes(availableSpace)}
+            </span>
           </div>
           <Progress value={getUsagePercentage()} className="h-2" />
           <p className="text-xs text-muted-foreground">
@@ -78,7 +86,10 @@ export function StorageInfo() {
               {backgroundImageInfo.fileSize && (
                 <div>Size: {formatBytes(backgroundImageInfo.fileSize)}</div>
               )}
-              <div>Added: {new Date(backgroundImageInfo.timestamp).toLocaleDateString()}</div>
+              <div>
+                Added:{' '}
+                {new Date(backgroundImageInfo.timestamp).toLocaleDateString()}
+              </div>
             </div>
           </div>
         )}
@@ -91,7 +102,9 @@ export function StorageInfo() {
             disabled={isLoading}
             className="flex-1"
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
+            />
             Refresh
           </Button>
           {hasBackgroundImage() && (
@@ -99,7 +112,11 @@ export function StorageInfo() {
               variant="outline"
               size="sm"
               onClick={() => {
-                if (confirm('Are you sure you want to clear all local storage data?')) {
+                if (
+                  confirm(
+                    'Are you sure you want to clear all local storage data?'
+                  )
+                ) {
                   storageManager.clear();
                   loadStorageInfo();
                 }

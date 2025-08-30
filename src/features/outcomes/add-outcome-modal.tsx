@@ -15,6 +15,7 @@ import { useAuth } from '@/shared/hooks/auth';
 import { useAlert } from '@/shared/hooks/alert';
 import { useOutcomes } from '@/entities/outcomes/model/use-outcomes';
 import { useGoalSelection } from '@/app/providers/goal';
+import { getCurrencySymbol } from '@/shared/lib/currency';
 import { type AddOutcomeFormData, addOutcomeSchema } from './schemas';
 
 export type AddOutcomeModalProps = {
@@ -28,10 +29,13 @@ export function AddOutcomeModal({
 }: Readonly<AddOutcomeModalProps>) {
   const { user } = useAuth();
   const { setAlert } = useAlert();
-  const { selectedGoalId } = useGoalSelection();
+  const { selectedGoalId, selectedGoal } = useGoalSelection();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const { addOutcome } = useOutcomes(user?.uid, selectedGoalId || undefined);
+
+  // Get currency symbol from selected goal
+  const currencySymbol = selectedGoal ? getCurrencySymbol(selectedGoal.goalCurrency) : '$';
 
   const {
     register,
@@ -74,11 +78,16 @@ export function AddOutcomeModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Outcome</DialogTitle>
+          {selectedGoal && (
+            <p className="text-sm text-muted-foreground">
+              For goal: {selectedGoal.goal} ({currencySymbol})
+            </p>
+          )}
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+            <Label htmlFor="amount">Amount ({currencySymbol})</Label>
             <Input
               id="amount"
               type="number"
