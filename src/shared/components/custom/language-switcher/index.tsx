@@ -21,7 +21,7 @@ export function LanguageSwitcher() {
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center justify-start gap-2 w-full lg:w-fit"
+          className="flex items-center justify-start gap-2 w-fit"
         >
           <Globe className="h-4 w-4 mr-3" />
           <span className="hidden sm:inline">

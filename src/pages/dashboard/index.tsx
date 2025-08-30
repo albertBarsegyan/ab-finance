@@ -3,7 +3,10 @@ import { useAuth } from '@/shared/hooks/auth';
 import { useGoalSelection } from '@/app/providers/goal';
 import { useIncomes } from '@/entities/incomes/model/use-incomes';
 import { useOutcomes } from '@/entities/outcomes/model/use-outcomes';
-import { formatCurrencyWithDecimals, getCurrencySymbol } from '@/shared/lib/currency';
+import {
+  formatCurrencyWithDecimals,
+  getCurrencySymbol,
+} from '@/shared/lib/currency';
 import { exportCombinedToCSV } from '@/shared/lib/csv-export';
 import { useTranslation } from 'react-i18next';
 
@@ -273,13 +276,18 @@ export function DashboardPage() {
 
                 <div className="flex items-baseline gap-1">
                   <span className="text-xl font-bold sm:text-2xl">
-                    {formatCurrencyWithDecimals(metric.currentValue, currencyCode)}
+                    {formatCurrencyWithDecimals(
+                      metric.currentValue,
+                      currencyCode
+                    )}
                   </span>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">{t('dashboard.thisPeriod')}</span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.thisPeriod')}
+                    </span>
                     <span className="text-muted-foreground">
                       {currencyCode} ({currencySymbol})
                     </span>
@@ -297,9 +305,9 @@ export function DashboardPage() {
 
       {/* Actions */}
       <div className="flex gap-2">
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="outline"
+          size="sm"
           className="w-full sm:w-auto"
           onClick={handleExportCombined}
           disabled={incomes.length === 0 && outcomes.length === 0}

@@ -22,9 +22,6 @@ export function PWAProvider({ children }: PWAProviderProps) {
           onOfflineReady() {
             setOfflineReady(true);
           },
-          onRegisterError(error: Error) {
-            console.log('SW registration error', error);
-          },
         });
 
         setUpdateSW(() => updateServiceWorker);

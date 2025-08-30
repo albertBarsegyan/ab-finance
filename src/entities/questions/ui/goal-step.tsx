@@ -43,9 +43,7 @@ export function GoalStep({ goal, setGoal, onNext }: Props) {
   return (
     <>
       <CardHeader>
-        <CardTitle>
-          {t('questions.step1')}
-        </CardTitle>
+        <CardTitle>{t('questions.step1')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-3">

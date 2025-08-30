@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 import { X, Download, WifiOff } from 'lucide-react';
 
 interface PWAUpdateNotificationProps {
@@ -9,10 +15,10 @@ interface PWAUpdateNotificationProps {
   isOfflineReady?: boolean;
 }
 
-export function PWAUpdateNotification({ 
-  onUpdate, 
-  onDismiss, 
-  isOfflineReady = false 
+export function PWAUpdateNotification({
+  onUpdate,
+  onDismiss,
+  isOfflineReady = false,
 }: PWAUpdateNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -52,10 +58,9 @@ export function PWAUpdateNotification({
         </CardHeader>
         <CardContent className="pt-0">
           <CardDescription className="text-sm mb-3">
-            {isOfflineReady 
+            {isOfflineReady
               ? 'Your app is now ready to work offline. You can use it without an internet connection.'
-              : 'A new version of the app is available. Update to get the latest features and improvements.'
-            }
+              : 'A new version of the app is available. Update to get the latest features and improvements.'}
           </CardDescription>
           <div className="flex gap-2">
             {!isOfflineReady && (

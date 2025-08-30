@@ -43,10 +43,10 @@ export default function QuestionsPage() {
     return (
       <QuestionsLayout>
         <div className="text-center py-8">
-          <h2 className="text-2xl font-semibold mb-4">{t('questions.loading')}</h2>
-          <p className="text-muted-foreground">
-            {t('questions.pleaseWait')}
-          </p>
+          <h2 className="text-2xl font-semibold mb-4">
+            {t('questions.loading')}
+          </h2>
+          <p className="text-muted-foreground">{t('questions.pleaseWait')}</p>
         </div>
       </QuestionsLayout>
     );

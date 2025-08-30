@@ -106,7 +106,10 @@ export function ExpensesPage() {
           <CardContent>
             <div className="text-xl font-bold text-red-600 sm:text-2xl">
               {formatCurrencyWithDecimals(
-                outcomes.reduce((sum, outcome) => sum + Number(outcome.amount || 0), 0),
+                outcomes.reduce(
+                  (sum, outcome) => sum + Number(outcome.amount || 0),
+                  0
+                ),
                 currencyCode
               )}
             </div>
@@ -187,7 +190,10 @@ export function ExpensesPage() {
                         }`}
                       >
                         {transaction.type === 'income' ? '+' : ''}
-                        {formatCurrencyWithDecimals(Math.abs(transaction.amount), currencyCode)}
+                        {formatCurrencyWithDecimals(
+                          Math.abs(transaction.amount),
+                          currencyCode
+                        )}
                       </span>
                     </div>
                   </div>

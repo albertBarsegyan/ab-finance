@@ -35,7 +35,9 @@ export function AddOutcomeModal({
   const { addOutcome } = useOutcomes(user?.uid, selectedGoalId || undefined);
 
   // Get currency symbol from selected goal
-  const currencySymbol = selectedGoal ? getCurrencySymbol(selectedGoal.goalCurrency) : '$';
+  const currencySymbol = selectedGoal
+    ? getCurrencySymbol(selectedGoal.goalCurrency)
+    : '$';
 
   const {
     register,

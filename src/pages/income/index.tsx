@@ -14,7 +14,15 @@ import { useIncomes } from '@/entities/incomes/model/use-incomes';
 import { useGoalSelection } from '@/app/providers/goal';
 import { formatCurrencyWithDecimals } from '@/shared/lib/currency';
 import { exportIncomesToCSV } from '@/shared/lib/csv-export';
-import { Car, DollarSign, Download, Heart, Home, Plane, Plus } from 'lucide-react';
+import {
+  Car,
+  DollarSign,
+  Download,
+  Heart,
+  Home,
+  Plane,
+  Plus,
+} from 'lucide-react';
 
 // Helper function to get icon and color based on income category
 const getIncomeIconAndColor = (category: string) => {
@@ -168,7 +176,10 @@ export function IncomePage() {
                       </div>
                       <div className="text-right">
                         <p className="font-medium text-green-600">
-                          {formatCurrencyWithDecimals(income.amount, currencyCode)}
+                          {formatCurrencyWithDecimals(
+                            income.amount,
+                            currencyCode
+                          )}
                         </p>
                         <Badge variant="default" className="text-xs">
                           {income.status}

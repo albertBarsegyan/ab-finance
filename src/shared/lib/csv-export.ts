@@ -25,21 +25,29 @@ export interface GoalInfo {
 /**
  * Converts data to CSV format
  */
-function convertToCSV(data: Record<string, unknown>[], headers: string[]): string {
+function convertToCSV(
+  data: Record<string, unknown>[],
+  headers: string[]
+): string {
   const csvContent = [
     headers.join(','),
-    ...data.map(row => 
-      headers.map(header => {
-        const value = row[header];
-        // Escape commas and quotes in CSV
-        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-        return value || '';
-      }).join(',')
-    )
+    ...data.map(row =>
+      headers
+        .map(header => {
+          const value = row[header];
+          // Escape commas and quotes in CSV
+          if (
+            typeof value === 'string' &&
+            (value.includes(',') || value.includes('"'))
+          ) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value || '';
+        })
+        .join(',')
+    ),
   ].join('\n');
-  
+
   return csvContent;
 }
 
@@ -49,7 +57,7 @@ function convertToCSV(data: Record<string, unknown>[], headers: string[]): strin
 function downloadCSV(csvContent: string, filename: string): void {
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
-  
+
   if (link.download !== undefined) {
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
@@ -67,7 +75,7 @@ function downloadCSV(csvContent: string, filename: string): void {
  */
 function formatDateForCSV(date: unknown): string {
   if (!date) return '';
-  
+
   try {
     const dateObj = new Date(date as string | number);
     return dateObj.toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -90,7 +98,7 @@ export function exportIncomesToCSV(
     i18n.t('csv.amount'),
     i18n.t('csv.currency'),
     i18n.t('csv.goal'),
-    i18n.t('csv.goalId')
+    i18n.t('csv.goalId'),
   ];
 
   const csvData = incomes.map(income => ({
@@ -99,13 +107,15 @@ export function exportIncomesToCSV(
     [i18n.t('csv.amount')]: income.amount,
     [i18n.t('csv.currency')]: currencyCode,
     [i18n.t('csv.goal')]: goalInfo?.goal || i18n.t('goals.unknownGoal'),
-    [i18n.t('csv.goalId')]: income.goalId
+    [i18n.t('csv.goalId')]: income.goalId,
   }));
 
   const csvContent = convertToCSV(csvData, headers);
-  const goalName = goalInfo?.goal ? goalInfo.goal.replace(/[^a-zA-Z0-9]/g, '_') : 'all_goals';
+  const goalName = goalInfo?.goal
+    ? goalInfo.goal.replace(/[^a-zA-Z0-9]/g, '_')
+    : 'all_goals';
   const filename = `incomes_${goalName}_${new Date().toISOString().split('T')[0]}.csv`;
-  
+
   downloadCSV(csvContent, filename);
 }
 
@@ -123,7 +133,7 @@ export function exportOutcomesToCSV(
     i18n.t('csv.amount'),
     i18n.t('csv.currency'),
     i18n.t('csv.goal'),
-    i18n.t('csv.goalId')
+    i18n.t('csv.goalId'),
   ];
 
   const csvData = outcomes.map(outcome => ({
@@ -132,13 +142,15 @@ export function exportOutcomesToCSV(
     [i18n.t('csv.amount')]: outcome.amount,
     [i18n.t('csv.currency')]: currencyCode,
     [i18n.t('csv.goal')]: goalInfo?.goal || i18n.t('goals.unknownGoal'),
-    [i18n.t('csv.goalId')]: outcome.goalId
+    [i18n.t('csv.goalId')]: outcome.goalId,
   }));
 
   const csvContent = convertToCSV(csvData, headers);
-  const goalName = goalInfo?.goal ? goalInfo.goal.replace(/[^a-zA-Z0-9]/g, '_') : 'all_goals';
+  const goalName = goalInfo?.goal
+    ? goalInfo.goal.replace(/[^a-zA-Z0-9]/g, '_')
+    : 'all_goals';
   const filename = `expenses_${goalName}_${new Date().toISOString().split('T')[0]}.csv`;
-  
+
   downloadCSV(csvContent, filename);
 }
 
@@ -158,27 +170,27 @@ export function exportCombinedToCSV(
     i18n.t('csv.amount'),
     i18n.t('csv.currency'),
     i18n.t('csv.goal'),
-    i18n.t('csv.goalId')
+    i18n.t('csv.goalId'),
   ];
 
   const incomeData = incomes.map(income => ({
     [i18n.t('csv.date')]: formatDateForCSV(income.createdAt),
-    'Type': i18n.t('income.defaultNote'),
+    Type: i18n.t('income.defaultNote'),
     [i18n.t('csv.description')]: income.note || i18n.t('income.defaultNote'),
     [i18n.t('csv.amount')]: income.amount,
     [i18n.t('csv.currency')]: currencyCode,
     [i18n.t('csv.goal')]: goalInfo?.goal || i18n.t('goals.unknownGoal'),
-    [i18n.t('csv.goalId')]: income.goalId
+    [i18n.t('csv.goalId')]: income.goalId,
   }));
 
   const outcomeData = outcomes.map(outcome => ({
     [i18n.t('csv.date')]: formatDateForCSV(outcome.createdAt),
-    'Type': i18n.t('expenses.defaultNote'),
+    Type: i18n.t('expenses.defaultNote'),
     [i18n.t('csv.description')]: outcome.note || i18n.t('expenses.defaultNote'),
     [i18n.t('csv.amount')]: outcome.amount,
     [i18n.t('csv.currency')]: currencyCode,
     [i18n.t('csv.goal')]: goalInfo?.goal || i18n.t('goals.unknownGoal'),
-    [i18n.t('csv.goalId')]: outcome.goalId
+    [i18n.t('csv.goalId')]: outcome.goalId,
   }));
 
   // Combine and sort by date (newest first)
@@ -189,8 +201,10 @@ export function exportCombinedToCSV(
   });
 
   const csvContent = convertToCSV(combinedData, headers);
-  const goalName = goalInfo?.goal ? goalInfo.goal.replace(/[^a-zA-Z0-9]/g, '_') : 'all_goals';
+  const goalName = goalInfo?.goal
+    ? goalInfo.goal.replace(/[^a-zA-Z0-9]/g, '_')
+    : 'all_goals';
   const filename = `transactions_${goalName}_${new Date().toISOString().split('T')[0]}.csv`;
-  
+
   downloadCSV(csvContent, filename);
 }
