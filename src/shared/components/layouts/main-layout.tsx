@@ -77,7 +77,7 @@ export function MainLayout() {
 
             <div className="flex items-center space-x-2">
               <UserGoalsDropdown />
-              <LanguageSwitcher />
+
               <Button
                 variant="ghost"
                 size="sm"

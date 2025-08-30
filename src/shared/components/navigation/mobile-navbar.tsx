@@ -41,7 +41,7 @@ export function MobileNavbar() {
             </a>
           </div>
 
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <Button
               variant="ghost"
               size="sm"
