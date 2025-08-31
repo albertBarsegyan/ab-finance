@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!sitemap\\.xml|robots\\.txt|favicon-data/|assets/|api/).*)",
       "destination": "/"
     }
   ],
@@ -40,7 +40,7 @@
         },
         {
           "key": "Cache-Control",
-          "value": "public, max-age=86400"
+          "value": "public, max-age=86400, s-maxage=86400"
         }
       ]
     },
@@ -53,7 +53,33 @@
         },
         {
           "key": "Cache-Control",
-          "value": "public, max-age=86400"
+          "value": "public, max-age=86400, s-maxage=86400"
+        }
+      ]
+    },
+    {
+      "source": "/api/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, s-maxage=86400"
+        }
+      ]
+    },
+    {
+      "source": "/api/robots.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, s-maxage=86400"
         }
       ]
     },
@@ -81,6 +107,16 @@
       "source": "/home",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/api/sitemap.xml",
+      "destination": "/sitemap.xml",
+      "permanent": false
+    },
+    {
+      "source": "/api/robots.txt",
+      "destination": "/robots.txt",
+      "permanent": false
     }
   ]
 }
