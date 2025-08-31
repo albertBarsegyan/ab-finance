@@ -50,13 +50,25 @@
     
     <div>
         <a href="/sitemap.xml" class="test-link" target="_blank">
-            📋 View Sitemap.xml
+            📋 View Sitemap.xml (via API)
         </a>
     </div>
     
     <div>
         <a href="/robots.txt" class="test-link" target="_blank">
-            🤖 View Robots.txt
+            🤖 View Robots.txt (via API)
+        </a>
+    </div>
+    
+    <div>
+        <a href="/api/sitemap.xml" class="test-link" target="_blank">
+            🔧 Direct API Sitemap
+        </a>
+    </div>
+    
+    <div>
+        <a href="/api/robots.txt" class="test-link" target="_blank">
+            🔧 Direct API Robots
         </a>
     </div>
     
@@ -132,8 +144,10 @@
     
     <p>After deployment, you should be able to access:</p>
     <ul>
-        <li><code>https://abfinance.me/sitemap.xml</code> - Returns your sitemap</li>
-        <li><code>https://abfinance.me/robots.txt</code> - Returns your robots.txt</li>
+        <li><code>https://abfinance.me/sitemap.xml</code> - Returns your sitemap (via API redirect)</li>
+        <li><code>https://abfinance.me/robots.txt</code> - Returns your robots.txt (via API redirect)</li>
+        <li><code>https://abfinance.me/api/sitemap.xml</code> - Direct API sitemap</li>
+        <li><code>https://abfinance.me/api/robots.txt</code> - Direct API robots</li>
         <li><code>https://abfinance.me/favicon-data/site.webmanifest</code> - Returns your PWA manifest</li>
     </ul>
     
