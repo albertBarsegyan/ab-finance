@@ -26,7 +26,7 @@ import { useGoalSelection } from '@/app/providers/goal';
 import { currencies } from '@/shared/constants/currencies';
 import { ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { type AddGoalFormData, addGoalSchema } from './schemas';
+import { type AddGoalFormData, addGoalSchema, goalTypes } from './schemas';
 
 export type AddGoalModalProps = {
   open: boolean;
@@ -50,22 +50,23 @@ export function AddGoalModal({
     watch,
   } = useForm<AddGoalFormData>({
     resolver: zodResolver(addGoalSchema),
+    mode: 'onChange',
     defaultValues: {
       goal: '',
+      goalType: goalTypes[0],
       goalPrice: '',
       goalCurrency: 'USD',
+      note: '',
       goalDuration: {
         days: 0,
         months: 0,
         years: 0,
       },
     },
-    mode: 'onChange',
   });
 
-  console.log('watch', watch());
-
   const goalCurrency = watch('goalCurrency');
+  const goalType = watch('goalType');
   const goalDuration = watch('goalDuration');
 
   const onSubmit = async (data: AddGoalFormData) => {
@@ -73,9 +74,11 @@ export function AddGoalModal({
 
     const result = await addGoal({
       goal: data.goal.trim(),
+      goalType: data.goalType,
       goalPrice: data.goalPrice,
       goalCurrency: data.goalCurrency,
       goalDuration: data.goalDuration,
+      note: data.note || '',
       userId: user.uid,
     });
 
@@ -116,11 +119,38 @@ export function AddGoalModal({
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="goalType">Goal Type</Label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                  {goalType}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                sideOffset={4}
+                className="max-h-60 overflow-y-auto w-[var(--radix-dropdown-menu-trigger-width)]"
+              >
+                {goalTypes.map(type => (
+                  <DropdownMenuItem
+                    key={type}
+                    onClick={() => setValue('goalType', type)}
+                  >
+                    {type}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {errors.goalType && (
+              <p className="text-sm text-red-500">{errors.goalType.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="goalPrice">{t('goals.targetAmount')}</Label>
             <Input
               id="goalPrice"
-              type="number"
-              placeholder="0"
               className={errors.goalPrice ? 'border-red-500' : ''}
               {...register('goalPrice')}
             />
@@ -140,7 +170,11 @@ export function AddGoalModal({
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-full max-h-60 overflow-y-auto">
+              <DropdownMenuContent
+                align="start"
+                sideOffset={4}
+                className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-60 overflow-y-auto"
+              >
                 {currencies.map(currency => (
                   <DropdownMenuItem
                     key={currency.code}
@@ -168,6 +202,19 @@ export function AddGoalModal({
               label={t('goals.goalDuration')}
               description={t('goals.selectGoalDuration')}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="note">Note (optional)</Label>
+            <Input
+              id="note"
+              placeholder="Add a note about this goal"
+              className={errors.note ? 'border-red-500' : ''}
+              {...register('note')}
+            />
+            {errors.note && (
+              <p className="text-sm text-red-500">{errors.note.message}</p>
+            )}
           </div>
 
           <DialogFooter>

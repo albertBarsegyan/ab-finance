@@ -17,8 +17,9 @@ export type Outcome = {
   goalId: string;
   createdAt?: unknown;
   updatedAt?: unknown;
-  note: string;
   amount: string;
+  outcomeType: string;
+  note: string;
 };
 
 export type NewOutcome = Omit<Outcome, 'id' | 'createdAt' | 'updatedAt'>;

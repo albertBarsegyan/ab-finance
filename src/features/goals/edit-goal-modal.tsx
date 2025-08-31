@@ -18,15 +18,15 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
 import {
-  DurationPicker,
   type Duration,
+  DurationPicker,
 } from '@/shared/components/ui/duration-picker';
 import { useAlert } from '@/shared/hooks/alert';
 import { useGoalSelection } from '@/app/providers/goal';
 import { currencies } from '@/shared/constants/currencies';
 import { ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { type EditGoalFormData, editGoalSchema } from './schemas';
+import { type EditGoalFormData, editGoalSchema, goalTypes } from './schemas';
 
 export type EditGoalModalProps = {
   open: boolean;
@@ -56,6 +56,7 @@ export function EditGoalModal({
     resolver: zodResolver(editGoalSchema),
     defaultValues: {
       goal: goalToEdit?.goal || '',
+      goalType: goalToEdit?.goalType || 'Emergency Fund',
       goalPrice: goalToEdit?.goalPrice || '',
       goalCurrency: goalToEdit?.goalCurrency || 'USD',
       goalDuration: goalToEdit?.goalDuration || {
@@ -63,6 +64,7 @@ export function EditGoalModal({
         months: 0,
         years: 0,
       },
+      note: goalToEdit?.note || '',
     },
     mode: 'onChange',
   });
@@ -71,6 +73,7 @@ export function EditGoalModal({
     if (goalToEdit && open) {
       reset({
         goal: goalToEdit.goal,
+        goalType: goalToEdit.goalType,
         goalPrice: goalToEdit.goalPrice,
         goalCurrency: goalToEdit.goalCurrency,
         goalDuration: goalToEdit.goalDuration || {
@@ -78,6 +81,7 @@ export function EditGoalModal({
           months: 0,
           years: 0,
         },
+        note: goalToEdit.note || '',
       });
     }
   }, [goalToEdit, open, reset]);
@@ -85,6 +89,7 @@ export function EditGoalModal({
   useEffect(() => {
     if (goalToEdit) {
       setValue('goal', goalToEdit.goal);
+      setValue('goalType', goalToEdit.goalType);
       setValue('goalPrice', goalToEdit.goalPrice);
       setValue('goalCurrency', goalToEdit.goalCurrency);
       setValue(
@@ -95,10 +100,12 @@ export function EditGoalModal({
           years: 0,
         }
       );
+      setValue('note', goalToEdit.note || '');
     }
   }, [goalToEdit, setValue]);
 
   const goalCurrency = watch('goalCurrency');
+  const goalType = watch('goalType');
   const goalDuration = watch('goalDuration');
 
   const onSubmit = async (data: EditGoalFormData) => {
@@ -107,9 +114,11 @@ export function EditGoalModal({
 
     const result = await updateGoal(goalToEdit.id, {
       goal: data.goal.trim(),
+      goalType: data.goalType,
       goalPrice: data.goalPrice,
       goalCurrency: data.goalCurrency,
       goalDuration: data.goalDuration,
+      note: data.note || '',
     });
 
     if (result.success) {
@@ -152,11 +161,40 @@ export function EditGoalModal({
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="goalType">Goal Type</Label>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    {goalType}
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  sideOffset={4}
+                  className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-60 overflow-y-auto"
+                >
+                  {goalTypes.map(type => (
+                    <DropdownMenuItem
+                      key={type}
+                      onClick={() => setValue('goalType', type)}
+                    >
+                      {type}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {errors.goalType && (
+                <p className="text-sm text-red-500">
+                  {errors.goalType.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="goalPrice">{t('goals.targetAmount')}</Label>
               <Input
                 id="goalPrice"
-                type="number"
-                placeholder="0"
                 className={errors.goalPrice ? 'border-red-500' : ''}
                 {...register('goalPrice')}
               />
@@ -178,7 +216,11 @@ export function EditGoalModal({
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full max-h-60 overflow-y-auto">
+                <DropdownMenuContent
+                  align="start"
+                  sideOffset={4}
+                  className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-60 overflow-y-auto"
+                >
                   {currencies.map(currency => (
                     <DropdownMenuItem
                       key={currency.code}
@@ -206,6 +248,19 @@ export function EditGoalModal({
                 label={t('goals.goalDuration')}
                 description={t('goals.selectGoalDuration')}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="note">Note (optional)</Label>
+              <Input
+                id="note"
+                placeholder="Add a note about this goal"
+                className={errors.note ? 'border-red-500' : ''}
+                {...register('note')}
+              />
+              {errors.note && (
+                <p className="text-sm text-red-500">{errors.note.message}</p>
+              )}
             </div>
 
             <DialogFooter>

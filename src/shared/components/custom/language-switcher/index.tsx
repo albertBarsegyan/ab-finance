@@ -29,7 +29,11 @@ export function LanguageSwitcher() {
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-full">
+      <DropdownMenuContent
+        align="start"
+        sideOffset={4}
+        className="w-[var(--radix-dropdown-menu-trigger-width)]"
+      >
         {availableLanguages.map(language => (
           <DropdownMenuItem
             key={language.code}

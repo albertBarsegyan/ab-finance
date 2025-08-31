@@ -43,7 +43,7 @@ export function ExpensesPage() {
       id: outcome.id,
       description: (outcome.note as string) || 'Expense',
       amount: -Number(outcome.amount || 0), // Negative for expenses
-      category: 'Expense',
+      category: outcome.outcomeType || '🔧 Other',
       date: outcome.createdAt
         ? new Date(outcome.createdAt as number).toISOString().split('T')[0]
         : new Date().toISOString().split('T')[0],
@@ -70,6 +70,10 @@ export function ExpensesPage() {
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
             Expenses
           </h1>
+
+          {selectedGoal && (
+            <p className="text-muted-foreground">Goal: {selectedGoal?.goal}</p>
+          )}
           <p className="text-muted-foreground">
             View and manage your financial expenses.
           </p>

@@ -45,10 +45,9 @@ export function UserGoalsDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-72 sm:w-80"
         align="start"
-        side="bottom"
-        sideOffset={8}
+        sideOffset={4}
+        className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-60"
       >
         <DropdownMenuLabel className="flex items-center justify-between">
           <span className="text-sm">Your Financial Goals</span>

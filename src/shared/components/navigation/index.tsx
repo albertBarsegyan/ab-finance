@@ -2,7 +2,6 @@ import { Button } from '@/shared/components/ui/button.tsx';
 import { appPath, homeSectionName } from '@/shared/constants/app-path.ts';
 import { SectionLayout } from '@/shared/components/layouts/section-layout.tsx';
 import { AbFinanceLogo } from '@/shared/components/icons/logo.tsx';
-import { LanguageSwitcher } from '@/shared/components/custom/language-switcher';
 import { useTranslation } from 'react-i18next';
 
 export function Navbar() {
@@ -44,7 +43,7 @@ export function Navbar() {
           </a>
         </nav>
         <div className="ml-4 flex gap-2">
-          <LanguageSwitcher />
+          {/*<LanguageSwitcher />*/}
           <a href={appPath.LOGIN}>
             <Button className="cursor-pointer" variant="ghost" size="sm">
               {t('auth.signIn')}

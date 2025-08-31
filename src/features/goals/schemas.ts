@@ -11,6 +11,30 @@ const durationSchema = z
     'At least one duration field must be greater than 0'
   );
 
+export const goalTypes = [
+  '🚨 Emergency Fund',
+  '🏖️ Vacation',
+  '🏠 Home Purchase',
+  '🚗 Car Purchase',
+  '🎓 Education',
+  '💒 Wedding',
+  '🏖️ Retirement',
+  '💼 Business Investment',
+  '💳 Debt Payoff',
+  '🔨 Home Renovation',
+  '🏥 Medical Expenses',
+  '💻 Technology Upgrade',
+  '✈️ Travel',
+  '💪 Fitness & Health',
+  '🎨 Hobby Equipment',
+  '🎁 Gift Fund',
+  '📊 Tax Savings',
+  '🛡️ Insurance Premium',
+  '❤️ Charity Donation',
+  '📈 Investment Portfolio',
+  '🔧 Other',
+] as const;
+
 export const addGoalSchema = z.object({
   goal: z
     .string()
@@ -18,6 +42,7 @@ export const addGoalSchema = z.object({
     .min(2, 'Goal name must be at least 2 characters')
     .max(100, 'Goal name must be less than 100 characters')
     .trim(),
+  goalType: z.string().min(1, 'Goal type is required'),
   goalPrice: z
     .string()
     .min(1, 'Goal price is required')
@@ -25,6 +50,7 @@ export const addGoalSchema = z.object({
     .refine(val => Number(val) > 0, 'Goal price must be greater than 0'),
   goalCurrency: z.string().min(1, 'Currency is required'),
   goalDuration: durationSchema,
+  note: z.string().optional(),
 });
 
 export type AddGoalFormData = z.infer<typeof addGoalSchema>;

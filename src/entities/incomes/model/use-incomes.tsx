@@ -18,6 +18,7 @@ export type Income = {
   createdAt?: unknown;
   updatedAt?: unknown;
   amount: number;
+  incomeType: string;
   note: string;
 };
 

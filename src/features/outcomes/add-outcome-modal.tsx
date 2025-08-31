@@ -11,12 +11,23 @@ import {
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/components/ui/dropdown-menu';
+import { ChevronDown } from 'lucide-react';
 import { useAuth } from '@/shared/hooks/auth';
 import { useAlert } from '@/shared/hooks/alert';
 import { useOutcomes } from '@/entities/outcomes/model/use-outcomes';
 import { useGoalSelection } from '@/app/providers/goal';
 import { getCurrencySymbol } from '@/shared/lib/currency';
-import { type AddOutcomeFormData, addOutcomeSchema } from './schemas';
+import {
+  type AddOutcomeFormData,
+  addOutcomeSchema,
+  outcomeTypes,
+} from './schemas';
 
 export type AddOutcomeModalProps = {
   open: boolean;
@@ -44,14 +55,19 @@ export function AddOutcomeModal({
     handleSubmit,
     formState: { errors, isValid },
     reset,
+    setValue,
+    watch,
   } = useForm<AddOutcomeFormData>({
     resolver: zodResolver(addOutcomeSchema),
     defaultValues: {
       amount: '',
+      outcomeType: outcomeTypes[0],
       note: '',
     },
     mode: 'onChange',
   });
+
+  const outcomeType = watch('outcomeType');
 
   const onSubmit = async (data: AddOutcomeFormData) => {
     if (!user?.uid || !selectedGoalId) return;
@@ -62,6 +78,7 @@ export function AddOutcomeModal({
       userId: user.uid,
       goalId: selectedGoalId,
       amount: data.amount,
+      outcomeType: data.outcomeType,
       note: data.note || '',
     });
 
@@ -92,13 +109,42 @@ export function AddOutcomeModal({
             <Label htmlFor="amount">Amount ({currencySymbol})</Label>
             <Input
               id="amount"
-              type="number"
-              placeholder="0"
               className={errors.amount ? 'border-red-500' : ''}
               {...register('amount')}
             />
             {errors.amount && (
               <p className="text-sm text-red-500">{errors.amount.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="outcomeType">Outcome Type</Label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                  {outcomeType}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                sideOffset={4}
+                className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-60 overflow-y-auto"
+              >
+                {outcomeTypes.map(type => (
+                  <DropdownMenuItem
+                    key={type}
+                    onClick={() => setValue('outcomeType', type)}
+                  >
+                    {type}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {errors.outcomeType && (
+              <p className="text-sm text-red-500">
+                {errors.outcomeType.message}
+              </p>
             )}
           </div>
 

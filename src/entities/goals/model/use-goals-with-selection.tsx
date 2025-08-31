@@ -14,6 +14,7 @@ import { db, firestoreCollection } from '@/shared/config/firebase.ts';
 export interface Goal {
   id: string;
   goal: string;
+  goalType: string;
   goalCurrency: string;
   goalPrice: string;
   goalDuration?: {
@@ -21,6 +22,7 @@ export interface Goal {
     months: number;
     years: number;
   };
+  note?: string;
   userId: string;
   createdAt: string;
   updatedAt: string;

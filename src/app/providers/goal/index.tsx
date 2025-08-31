@@ -20,7 +20,15 @@ interface GoalContextType {
   updateGoal: (
     goalId: string,
     updates: Partial<
-      Pick<Goal, 'goal' | 'goalPrice' | 'goalCurrency' | 'goalDuration'>
+      Pick<
+        Goal,
+        | 'goal'
+        | 'goalType'
+        | 'goalPrice'
+        | 'goalCurrency'
+        | 'goalDuration'
+        | 'note'
+      >
     >
   ) => Promise<{ success: boolean; error?: string }>;
   deleteGoal: (goalId: string) => Promise<{ success: boolean; error?: string }>;

@@ -30,7 +30,7 @@ import {
   formatCurrencyWithDecimals,
   getCurrencySymbol,
 } from '@/shared/lib/currency';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'; // Helper function to get icon and color based on goal name
 
 // Helper function to get icon and color based on goal name
 const getGoalIconAndColor = (goalName: string) => {
@@ -81,6 +81,7 @@ export function GoalsPage() {
       return {
         id: goal.id,
         name: goal.goal,
+        type: goal.goalType || '🔧 Other',
         description: `Target: ${formatCurrencyWithDecimals(targetAmount, goal.goalCurrency)}`,
         target: targetAmount,
         current: currentAmount,
@@ -172,7 +173,7 @@ export function GoalsPage() {
                           {goal.name}
                         </CardTitle>
                         <CardDescription className="truncate">
-                          {goal.description}
+                          {goal.type} • {goal.description}
                         </CardDescription>
                       </div>
                     </div>

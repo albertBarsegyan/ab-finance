@@ -26,7 +26,6 @@ import { appPath } from '@/shared/constants/app-path.ts';
 import { AbFinanceLogo } from '@/shared/components/icons/logo.tsx';
 import { UserGoalsDropdown } from '@/shared/components/custom/user-goals-dropdown.tsx';
 import { BackgroundImageModal } from '@/shared/components/custom/background-image-modal.tsx';
-import { LanguageSwitcher } from '@/shared/components/custom/language-switcher';
 import { useTranslation } from 'react-i18next';
 
 const navigation = [
@@ -146,7 +145,7 @@ export function MainLayout() {
           </nav>
 
           <div className="border-t border-gray-200 p-4 space-y-2">
-            <LanguageSwitcher />
+            {/*<LanguageSwitcher />*/}
             <Button
               onClick={() => setBackgroundModalOpen(true)}
               variant="outline"
@@ -199,7 +198,7 @@ export function MainLayout() {
           </nav>
 
           <div className="border-t border-gray-200 p-4 space-y-2">
-            <LanguageSwitcher />
+            {/*<LanguageSwitcher />*/}
             <Button
               onClick={() => setBackgroundModalOpen(true)}
               variant="outline"

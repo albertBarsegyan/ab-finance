@@ -3,6 +3,7 @@ import i18n from './i18n';
 export interface ExportableIncome {
   id: string;
   amount: number;
+  incomeType: string;
   note: string;
   createdAt?: unknown;
   goalId: string;
@@ -11,6 +12,7 @@ export interface ExportableIncome {
 export interface ExportableOutcome {
   id: string;
   amount: string;
+  outcomeType: string;
   note: string;
   createdAt?: unknown;
   goalId: string;
@@ -19,6 +21,7 @@ export interface ExportableOutcome {
 export interface GoalInfo {
   id: string;
   goal: string;
+  goalType: string;
   goalCurrency: string;
 }
 
@@ -94,6 +97,7 @@ export function exportIncomesToCSV(
 ): void {
   const headers = [
     i18n.t('csv.date'),
+    i18n.t('csv.type'),
     i18n.t('csv.description'),
     i18n.t('csv.amount'),
     i18n.t('csv.currency'),
@@ -103,6 +107,7 @@ export function exportIncomesToCSV(
 
   const csvData = incomes.map(income => ({
     [i18n.t('csv.date')]: formatDateForCSV(income.createdAt),
+    [i18n.t('csv.type')]: income.incomeType || 'Other',
     [i18n.t('csv.description')]: income.note || i18n.t('income.defaultNote'),
     [i18n.t('csv.amount')]: income.amount,
     [i18n.t('csv.currency')]: currencyCode,
@@ -129,6 +134,7 @@ export function exportOutcomesToCSV(
 ): void {
   const headers = [
     i18n.t('csv.date'),
+    i18n.t('csv.type'),
     i18n.t('csv.description'),
     i18n.t('csv.amount'),
     i18n.t('csv.currency'),
@@ -138,6 +144,7 @@ export function exportOutcomesToCSV(
 
   const csvData = outcomes.map(outcome => ({
     [i18n.t('csv.date')]: formatDateForCSV(outcome.createdAt),
+    [i18n.t('csv.type')]: outcome.outcomeType || 'Other',
     [i18n.t('csv.description')]: outcome.note || i18n.t('expenses.defaultNote'),
     [i18n.t('csv.amount')]: outcome.amount,
     [i18n.t('csv.currency')]: currencyCode,
@@ -165,7 +172,8 @@ export function exportCombinedToCSV(
 ): void {
   const headers = [
     i18n.t('csv.date'),
-    'Type',
+    'Transaction Type',
+    i18n.t('csv.type'),
     i18n.t('csv.description'),
     i18n.t('csv.amount'),
     i18n.t('csv.currency'),
@@ -175,7 +183,8 @@ export function exportCombinedToCSV(
 
   const incomeData = incomes.map(income => ({
     [i18n.t('csv.date')]: formatDateForCSV(income.createdAt),
-    Type: i18n.t('income.defaultNote'),
+    'Transaction Type': 'Income',
+    [i18n.t('csv.type')]: income.incomeType || 'Other',
     [i18n.t('csv.description')]: income.note || i18n.t('income.defaultNote'),
     [i18n.t('csv.amount')]: income.amount,
     [i18n.t('csv.currency')]: currencyCode,
@@ -185,7 +194,8 @@ export function exportCombinedToCSV(
 
   const outcomeData = outcomes.map(outcome => ({
     [i18n.t('csv.date')]: formatDateForCSV(outcome.createdAt),
-    Type: i18n.t('expenses.defaultNote'),
+    'Transaction Type': 'Expense',
+    [i18n.t('csv.type')]: outcome.outcomeType || 'Other',
     [i18n.t('csv.description')]: outcome.note || i18n.t('expenses.defaultNote'),
     [i18n.t('csv.amount')]: outcome.amount,
     [i18n.t('csv.currency')]: currencyCode,

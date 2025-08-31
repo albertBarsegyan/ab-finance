@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog';
-import { FileImage, Image, Trash2, Upload, X } from 'lucide-react';
+import { FileImage, Image, Trash2, Upload } from 'lucide-react';
 import { useAlert } from '@/shared/hooks/alert';
 
 export type BackgroundImageModalProps = {
@@ -218,20 +218,6 @@ export function BackgroundImageModal({
                   alt="Background preview"
                   className="w-full h-32 object-cover rounded-lg border"
                 />
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-2 right-2"
-                  onClick={() => {
-                    setPreviewUrl(currentBackgroundImage || null);
-                    setSelectedFile(null);
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = '';
-                    }
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
               </div>
             </div>
           )}

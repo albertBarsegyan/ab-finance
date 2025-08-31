@@ -63,6 +63,7 @@ export function IncomePage() {
       return {
         id: income.id,
         name: (income.note as string) || 'Income',
+        type: income.incomeType || '🔧 Other',
         icon,
         amount,
         color,
@@ -93,6 +94,10 @@ export function IncomePage() {
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
             Income
           </h1>
+
+          {selectedGoal && (
+            <p className="text-muted-foreground">Goal: {selectedGoal?.goal}</p>
+          )}
 
           <p className="text-muted-foreground">
             Track your Income and stay within your budget limits.
@@ -170,7 +175,7 @@ export function IncomePage() {
                         <div className="min-w-0 flex-1">
                           <p className="font-medium truncate">{income.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            {income.date}
+                            {income.type} • {income.date}
                           </p>
                         </div>
                       </div>

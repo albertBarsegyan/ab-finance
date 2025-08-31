@@ -4,7 +4,6 @@ import { Button } from '@/shared/components/ui/button';
 import { appPath, homeSectionName } from '@/shared/constants/app-path';
 import { Menu, X } from 'lucide-react';
 import { AbFinanceLogo } from '@/shared/components/icons/logo.tsx';
-import { LanguageSwitcher } from '@/shared/components/custom/language-switcher';
 
 interface NavigationItem {
   name: string;
@@ -89,7 +88,7 @@ export function MobileNavbar() {
 
           <div className="border-t border-gray-20e0 my-2" />
 
-          <LanguageSwitcher />
+          {/*<LanguageSwitcher />*/}
           <div className="px-3 py-2 space-y-2">
             <a href={appPath.LOGIN}>
               <Button variant="ghost" size="sm" className="w-full text-center">

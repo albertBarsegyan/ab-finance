@@ -18,7 +18,16 @@ import {
 } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Progress } from '@/shared/components/ui/progress';
-import { AlertTriangle, CheckCircle, Download, Info } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle,
+  Download,
+  Info,
+  Plus,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react';
+import { useModal } from '@/shared/hooks/modal';
 
 // Recharts
 import {
@@ -39,6 +48,7 @@ export function DashboardPage() {
   const { user } = useAuth();
   const { selectedGoal } = useGoalSelection();
   const { t } = useTranslation();
+  const { openModal } = useModal();
 
   const { incomes, loading: incomesLoading } = useIncomes(
     user?.uid,
@@ -49,41 +59,53 @@ export function DashboardPage() {
     selectedGoal?.id || undefined
   );
 
-  // Aggregate monthly data for charts (last 6 months)
-  const { monthlySeries, totalIncome, totalOutcome } = useMemo(() => {
-    const byMonth = new Map<string, { income: number; outcome: number }>();
+  // Aggregate daily data for charts (last 30 days)
+  const { dailySeries, totalIncome, totalOutcome } = useMemo(() => {
+    const byDay = new Map<string, { income: number; outcome: number }>();
 
-    const monthKey = (iso?: unknown) => {
+    const dayKey = (iso?: unknown) => {
       if (!iso || typeof iso !== 'string') return 'Unknown';
       const d = new Date(iso);
       if (Number.isNaN(d.getTime())) return 'Unknown';
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      return d.toISOString().split('T')[0]; // YYYY-MM-DD format
     };
 
     for (const inc of incomes) {
-      const key = monthKey(inc.createdAt);
-      const prev = byMonth.get(key) || { income: 0, outcome: 0 };
-      byMonth.set(key, { ...prev, income: prev.income + (inc.amount || 0) });
+      const key = dayKey(inc.createdAt);
+      const prev = byDay.get(key) || { income: 0, outcome: 0 };
+      byDay.set(key, { ...prev, income: prev.income + (inc.amount || 0) });
     }
 
     for (const out of outcomes) {
-      const key = monthKey(out.createdAt);
-      const prev = byMonth.get(key) || { income: 0, outcome: 0 };
+      const key = dayKey(out.createdAt);
+      const prev = byDay.get(key) || { income: 0, outcome: 0 };
       const amount =
         typeof out.amount === 'string'
           ? parseFloat(out.amount)
           : Number(out.amount || 0);
-      byMonth.set(key, { ...prev, outcome: prev.outcome + (amount || 0) });
+      byDay.set(key, { ...prev, outcome: prev.outcome + (amount || 0) });
     }
 
-    const sortedKeys = Array.from(byMonth.keys()).sort();
-    const lastSixKeys = sortedKeys.slice(-6);
-    const series = lastSixKeys.map(k => ({
-      month: k,
-      income: byMonth.get(k)?.income || 0,
-      spendings: byMonth.get(k)?.outcome || 0,
-      savings: (byMonth.get(k)?.income || 0) - (byMonth.get(k)?.outcome || 0),
-    }));
+    // Generate last 30 days
+    const today = new Date();
+    const last30Days = Array.from({ length: 30 }, (_, i) => {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      return date.toISOString().split('T')[0];
+    }).reverse();
+
+    const series = last30Days.map(day => {
+      const dayData = byDay.get(day) || { income: 0, outcome: 0 };
+      return {
+        day: new Date(day).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        }),
+        income: dayData.income,
+        spendings: dayData.outcome,
+        savings: dayData.income - dayData.outcome,
+      };
+    });
 
     const totals = series.reduce(
       (acc, cur) => {
@@ -94,7 +116,7 @@ export function DashboardPage() {
       { totalIncome: 0, totalOutcome: 0 }
     );
 
-    return { monthlySeries: series, ...totals };
+    return { dailySeries: series, ...totals };
   }, [incomes, outcomes]);
 
   const savingsTotal = Math.max(totalIncome - totalOutcome, 0);
@@ -114,6 +136,84 @@ export function DashboardPage() {
   const currencyCode = selectedGoal?.goalCurrency || 'USD';
   const currencySymbol = getCurrencySymbol(currencyCode);
 
+  // Category breakdown data
+  const {
+    incomeCategories,
+    expenseCategories,
+    savingsRate,
+    recentTransactions,
+  } = useMemo(() => {
+    // Income categories breakdown
+    const incomeCategoryMap = new Map<string, number>();
+    incomes.forEach(income => {
+      const type = income.incomeType || '🔧 Other';
+      const amount = income.amount || 0;
+      incomeCategoryMap.set(type, (incomeCategoryMap.get(type) || 0) + amount);
+    });
+
+    const incomeCategories = Array.from(incomeCategoryMap.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+
+    // Expense categories breakdown
+    const expenseCategoryMap = new Map<string, number>();
+    outcomes.forEach(outcome => {
+      const type = outcome.outcomeType || '🔧 Other';
+      const amount =
+        typeof outcome.amount === 'string'
+          ? parseFloat(outcome.amount)
+          : Number(outcome.amount || 0);
+      expenseCategoryMap.set(
+        type,
+        (expenseCategoryMap.get(type) || 0) + amount
+      );
+    });
+
+    const expenseCategories = Array.from(expenseCategoryMap.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+
+    // Calculate savings rate
+    const savingsRate =
+      totalIncome > 0 ? ((totalIncome - totalOutcome) / totalIncome) * 100 : 0;
+
+    // Recent transactions (last 10)
+    const allTransactions = [
+      ...incomes.map(income => ({
+        id: income.id,
+        type: 'income' as const,
+        category: income.incomeType || '🔧 Other',
+        description: income.note || 'Income',
+        amount: income.amount || 0,
+        date: income.createdAt
+          ? new Date(income.createdAt as string)
+          : new Date(),
+      })),
+      ...outcomes.map(outcome => ({
+        id: outcome.id,
+        type: 'expense' as const,
+        category: outcome.outcomeType || '🔧 Other',
+        description: outcome.note || 'Expense',
+        amount:
+          typeof outcome.amount === 'string'
+            ? parseFloat(outcome.amount)
+            : Number(outcome.amount || 0),
+        date: outcome.createdAt
+          ? new Date(outcome.createdAt as number)
+          : new Date(),
+      })),
+    ]
+      .sort((a, b) => b.date.getTime() - a.date.getTime())
+      .slice(0, 10);
+
+    return {
+      incomeCategories,
+      expenseCategories,
+      savingsRate,
+      recentTransactions: allTransactions,
+    };
+  }, [incomes, outcomes, totalIncome, totalOutcome]);
+
   const handleExportCombined = () => {
     exportCombinedToCSV(incomes, outcomes, selectedGoal, currencyCode);
   };
@@ -124,10 +224,9 @@ export function DashboardPage() {
       return {
         goalAmount: 0,
         daysRemaining: 0,
-        dailySpendingNeeded: 0,
-        projectedIncome: 0,
-        projectedOutcome: 0,
-        projectedSavings: 0,
+        dailySavingsNeeded: 0,
+        dailySpendingLimit: 0,
+        currentProgress: 0,
         isGoalAchievable: false,
       };
     }
@@ -143,40 +242,35 @@ export function DashboardPage() {
     const totalDaysRemaining =
       goalDuration.years * 365 + goalDuration.months * 30 + goalDuration.days;
 
-    // Calculate daily spending needed to reach goal
-    const dailySpendingNeeded =
-      totalDaysRemaining > 0 ? goalAmount / totalDaysRemaining : 0;
+    // Calculate current progress (how much has been saved towards this goal)
+    const currentSavings = Math.max(totalIncome - totalOutcome, 0);
+    const currentProgress =
+      goalAmount > 0 ? (currentSavings / goalAmount) * 100 : 0;
 
-    // Calculate projected totals until goal deadline
-    // For now, we'll use current monthly averages and project them
-    const currentMonthlyIncome =
-      monthlySeries.length > 0
-        ? monthlySeries.reduce((sum, month) => sum + month.income, 0) /
-          monthlySeries.length
-        : 0;
-    const currentMonthlyOutcome =
-      monthlySeries.length > 0
-        ? monthlySeries.reduce((sum, month) => sum + month.spendings, 0) /
-          monthlySeries.length
-        : 0;
+    // Calculate daily savings needed to reach goal
+    const remainingAmount = Math.max(goalAmount - currentSavings, 0);
+    const dailySavingsNeeded =
+      totalDaysRemaining > 0 ? remainingAmount / totalDaysRemaining : 0;
 
-    const monthsRemaining = Math.max(1, Math.ceil(totalDaysRemaining / 30));
-    const projectedIncome = currentMonthlyIncome * monthsRemaining;
-    const projectedOutcome = currentMonthlyOutcome * monthsRemaining;
-    const projectedSavings = projectedIncome - projectedOutcome;
+    // Calculate daily spending limit (based on average daily income)
+    const averageDailyIncome = totalIncome > 0 ? totalIncome / 30 : 0; // Assuming 30 days of data
+    const dailySpendingLimit = Math.max(
+      averageDailyIncome - dailySavingsNeeded,
+      0
+    );
 
-    const isGoalAchievable = projectedSavings >= goalAmount;
+    // Check if goal is achievable
+    const isGoalAchievable = dailySavingsNeeded <= averageDailyIncome;
 
     return {
       goalAmount,
       daysRemaining: totalDaysRemaining,
-      dailySpendingNeeded,
-      projectedIncome,
-      projectedOutcome,
-      projectedSavings,
+      dailySavingsNeeded,
+      dailySpendingLimit,
+      currentProgress,
       isGoalAchievable,
     };
-  }, [selectedGoal, monthlySeries]);
+  }, [selectedGoal, totalIncome, totalOutcome]);
 
   const financialMetrics = useMemo(
     () => [
@@ -234,20 +328,33 @@ export function DashboardPage() {
                 <div className="h-full flex items-center justify-center text-muted-foreground">
                   {t('dashboard.loadingChart')}
                 </div>
-              ) : monthlySeries.length === 0 ? (
+              ) : dailySeries.length === 0 ? (
                 <div className="h-full flex items-center justify-center text-muted-foreground">
                   {t('dashboard.noDataToDisplay')}
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={monthlySeries}
+                    data={dailySeries}
                     margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
+                    <XAxis
+                      dataKey="day"
+                      tick={{ fontSize: 12 }}
+                      interval="preserveStartEnd"
+                    />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip
+                      formatter={(value, name) => [
+                        formatCurrencyWithDecimals(Number(value), currencyCode),
+                        name === 'income'
+                          ? 'Income'
+                          : name === 'spendings'
+                            ? 'Expenses'
+                            : 'Savings',
+                      ]}
+                    />
                     <Legend />
                     <Line
                       type="monotone"
@@ -255,6 +362,7 @@ export function DashboardPage() {
                       stroke="#3B82F6"
                       strokeWidth={2}
                       dot={false}
+                      name="Income"
                     />
                     <Line
                       type="monotone"
@@ -262,6 +370,7 @@ export function DashboardPage() {
                       stroke="#F59E0B"
                       strokeWidth={2}
                       dot={false}
+                      name="Expenses"
                     />
                     <Line
                       type="monotone"
@@ -269,6 +378,7 @@ export function DashboardPage() {
                       stroke="#10B981"
                       strokeWidth={2}
                       dot={false}
+                      name="Savings"
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -327,94 +437,126 @@ export function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-              {/* Goal Amount */}
-              <div className="space-y-3">
+            <div className="space-y-6">
+              {/* Progress Bar */}
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-sm">
-                    {t('dashboard.goalAmount')}
-                  </h3>
-                  <Info className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xl font-bold sm:text-2xl">
-                    {formatCurrencyWithDecimals(
-                      goalMetrics.goalAmount,
-                      currencyCode
-                    )}
+                  <span className="text-sm font-medium">Progress</span>
+                  <span className="text-sm text-muted-foreground">
+                    {goalMetrics.currentProgress.toFixed(1)}%
                   </span>
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {t('dashboard.targetAmount')}
+                <Progress value={goalMetrics.currentProgress} className="h-3" />
+                <div className="text-xs text-muted-foreground">
+                  {formatCurrencyWithDecimals(
+                    Math.max(totalIncome - totalOutcome, 0),
+                    currencyCode
+                  )}{' '}
+                  saved of{' '}
+                  {formatCurrencyWithDecimals(
+                    goalMetrics.goalAmount,
+                    currencyCode
+                  )}{' '}
+                  target
                 </div>
               </div>
 
-              {/* Days Remaining */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-sm">
-                    {t('dashboard.daysRemaining')}
-                  </h3>
-                  <Info className="h-4 w-4 text-muted-foreground" />
+              {/* Metrics Grid */}
+              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                {/* Goal Amount */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-sm">Goal Amount</h3>
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl font-bold sm:text-2xl">
+                      {formatCurrencyWithDecimals(
+                        goalMetrics.goalAmount,
+                        currencyCode
+                      )}
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Target amount to save
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xl font-bold sm:text-2xl">
-                    {goalMetrics.daysRemaining}
-                  </span>
+
+                {/* Days Remaining */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-sm">Days Remaining</h3>
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl font-bold sm:text-2xl">
+                      {goalMetrics.daysRemaining}
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Until deadline
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {t('dashboard.untilDeadline')}
+
+                {/* Daily Savings Needed */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-sm">
+                      Daily Savings Needed
+                    </h3>
+                    <TrendingUp className="h-4 w-4 text-green-500" />
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl font-bold sm:text-2xl text-green-600">
+                      {formatCurrencyWithDecimals(
+                        goalMetrics.dailySavingsNeeded,
+                        currencyCode
+                      )}
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Per day to reach goal
+                  </div>
+                </div>
+
+                {/* Daily Spending Limit */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-sm">
+                      Daily Spending Limit
+                    </h3>
+                    <TrendingDown className="h-4 w-4 text-red-500" />
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl font-bold sm:text-2xl text-red-600">
+                      {formatCurrencyWithDecimals(
+                        goalMetrics.dailySpendingLimit,
+                        currencyCode
+                      )}
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Max per day to stay on track
+                  </div>
                 </div>
               </div>
 
-              {/* Daily Spending Needed */}
-              <div className="space-y-3">
+              {/* Goal Status */}
+              <div className="pt-4 border-t">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-sm">
-                    {t('dashboard.dailySpendingNeeded')}
-                  </h3>
-                  <AlertTriangle className="h-4 w-4 text-orange-500" />
-                </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xl font-bold sm:text-2xl">
-                    {formatCurrencyWithDecimals(
-                      goalMetrics.dailySpendingNeeded,
-                      currencyCode
-                    )}
-                  </span>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {t('dashboard.perDay')}
-                </div>
-              </div>
-
-              {/* Goal Achievability */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-sm">
-                    {t('dashboard.goalStatus')}
-                  </h3>
+                  <div>
+                    <h3 className="font-semibold text-sm">Goal Status</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {goalMetrics.isGoalAchievable
+                        ? "You're on track to reach your goal!"
+                        : 'Consider adjusting your savings or spending to reach your goal.'}
+                    </p>
+                  </div>
                   {goalMetrics.isGoalAchievable ? (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <CheckCircle className="h-8 w-8 text-green-500" />
                   ) : (
-                    <AlertTriangle className="h-4 w-4 text-orange-500" />
+                    <AlertTriangle className="h-8 w-8 text-orange-500" />
                   )}
-                </div>
-                <div className="flex items-baseline gap-1">
-                  <span
-                    className={`text-xl font-bold sm:text-2xl ${
-                      goalMetrics.isGoalAchievable
-                        ? 'text-green-600'
-                        : 'text-orange-600'
-                    }`}
-                  >
-                    {goalMetrics.isGoalAchievable
-                      ? t('dashboard.achievable')
-                      : t('dashboard.needsAdjustment')}
-                  </span>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {t('dashboard.basedOnProjections')}
                 </div>
               </div>
             </div>
@@ -472,19 +614,274 @@ export function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Actions */}
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full sm:w-auto"
-          onClick={handleExportCombined}
-          disabled={incomes.length === 0 && outcomes.length === 0}
-        >
-          <Download className="mr-2 h-4 w-4" />
-          {t('dashboard.exportAllData')}
-        </Button>
+      {/* Category Breakdown Section */}
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        {/* Income Categories */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold sm:text-lg flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-500" />
+              Income Categories
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              {loading ? (
+                <div className="h-full flex items-center justify-center text-muted-foreground">
+                  Loading...
+                </div>
+              ) : incomeCategories.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-muted-foreground">
+                  No income data available
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      dataKey="value"
+                      data={incomeCategories}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      label={({ name, percent }) =>
+                        `${name} ${((percent || 0) * 100).toFixed(0)}%`
+                      }
+                    >
+                      {incomeCategories.map((_, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={`hsl(${index * 45}, 70%, 50%)`}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={value =>
+                        formatCurrencyWithDecimals(Number(value), currencyCode)
+                      }
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Expense Categories */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold sm:text-lg flex items-center gap-2">
+              <TrendingDown className="h-5 w-5 text-red-500" />
+              Expense Categories
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              {loading ? (
+                <div className="h-full flex items-center justify-center text-muted-foreground">
+                  Loading...
+                </div>
+              ) : expenseCategories.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-muted-foreground">
+                  No expense data available
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      dataKey="value"
+                      data={expenseCategories}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      label={({ name, percent }) =>
+                        `${name} ${((percent || 0) * 100).toFixed(0)}%`
+                      }
+                    >
+                      {expenseCategories.map((_, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={`hsl(${index * 45 + 180}, 70%, 50%)`}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={value =>
+                        formatCurrencyWithDecimals(Number(value), currencyCode)
+                      }
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Savings Analytics & Recent Transactions */}
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        {/* Savings Analytics */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold sm:text-lg flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              Savings Analytics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Savings Rate</span>
+                <span
+                  className={`text-lg font-bold ${savingsRate >= 20 ? 'text-green-600' : savingsRate >= 10 ? 'text-yellow-600' : 'text-red-600'}`}
+                >
+                  {savingsRate.toFixed(1)}%
+                </span>
+              </div>
+              <Progress value={Math.min(savingsRate, 100)} className="h-2" />
+              <div className="text-xs text-muted-foreground">
+                {savingsRate >= 20
+                  ? 'Excellent savings rate!'
+                  : savingsRate >= 10
+                    ? 'Good savings rate'
+                    : 'Consider increasing your savings rate'}
+              </div>
+
+              <div className="pt-4 border-t">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <div className="text-muted-foreground">Total Income</div>
+                    <div className="font-semibold text-green-600">
+                      {formatCurrencyWithDecimals(totalIncome, currencyCode)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Total Expenses</div>
+                    <div className="font-semibold text-red-600">
+                      {formatCurrencyWithDecimals(totalOutcome, currencyCode)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Transactions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-semibold sm:text-lg">
+              Recent Transactions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {loading ? (
+                <div className="text-center py-4 text-muted-foreground">
+                  Loading...
+                </div>
+              ) : recentTransactions.length === 0 ? (
+                <div className="text-center py-4 text-muted-foreground">
+                  No transactions yet
+                </div>
+              ) : (
+                recentTransactions.map(transaction => (
+                  <div
+                    key={transaction.id}
+                    className="flex items-center justify-between p-2 rounded-lg border"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          transaction.type === 'income'
+                            ? 'bg-green-100'
+                            : 'bg-red-100'
+                        }`}
+                      >
+                        {transaction.type === 'income' ? (
+                          <TrendingUp className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-red-600" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm">
+                          {transaction.description}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {transaction.category}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div
+                        className={`font-semibold text-sm ${
+                          transaction.type === 'income'
+                            ? 'text-green-600'
+                            : 'text-red-600'
+                        }`}
+                      >
+                        {transaction.type === 'income' ? '+' : '-'}
+                        {formatCurrencyWithDecimals(
+                          transaction.amount,
+                          currencyCode
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {transaction.date.toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold sm:text-lg flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            Quick Actions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
+            <Button
+              variant="outline"
+              className="h-20 flex flex-col gap-2"
+              onClick={() => openModal('add-income')}
+            >
+              <TrendingUp className="h-6 w-6 text-green-600" />
+              <span className="text-sm">Add Income</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-20 flex flex-col gap-2"
+              onClick={() => openModal('add-outcome')}
+            >
+              <TrendingDown className="h-6 w-6 text-red-600" />
+              <span className="text-sm">Add Expense</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-20 flex flex-col gap-2"
+              onClick={() => openModal('add-goal')}
+            >
+              <CheckCircle className="h-6 w-6 text-blue-600" />
+              <span className="text-sm">Add Goal</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-20 flex flex-col gap-2"
+              onClick={handleExportCombined}
+              disabled={incomes.length === 0 && outcomes.length === 0}
+            >
+              <Download className="h-6 w-6 text-gray-600" />
+              <span className="text-sm">Export Data</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
