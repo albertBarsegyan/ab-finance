@@ -18,32 +18,81 @@ export default defineConfig({
         'favicon-data/favicon-96x96.png',
       ],
       manifest: {
-        name: 'abFinance',
-        short_name: 'abFin',
+        name: 'abFinance - Personal Finance Management',
+        short_name: 'abFinance',
         description:
-          'A modern finance management application for tracking income, expenses, and financial goals',
-        theme_color: '#ffffff',
+          'Track your income, expenses, and financial goals with abFinance. A modern, intuitive personal finance management application.',
+        theme_color: '#10B981',
         background_color: '#ffffff',
         display: 'standalone',
-        orientation: 'portrait',
+        orientation: 'portrait-primary',
         scope: '/',
         start_url: '/',
+        lang: 'en',
+        dir: 'ltr',
+        categories: ['finance', 'productivity', 'utilities'],
         icons: [
           {
             src: '/favicon-data/web-app-manifest-192x192.png',
             sizes: '192x192',
             type: 'image/png',
+            purpose: 'maskable',
           },
           {
             src: '/favicon-data/web-app-manifest-512x512.png',
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: '/favicon-data/web-app-manifest-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
           },
           {
             src: '/favicon-data/web-app-manifest-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
+          },
+        ],
+        shortcuts: [
+          {
+            name: 'Dashboard',
+            short_name: 'Dashboard',
+            description: 'View your financial overview',
+            url: '/dashboard',
+            icons: [
+              {
+                src: '/favicon-data/web-app-manifest-192x192.png',
+                sizes: '192x192',
+              },
+            ],
+          },
+          {
+            name: 'Add Income',
+            short_name: 'Add Income',
+            description: 'Quickly add income',
+            url: '/income',
+            icons: [
+              {
+                src: '/favicon-data/web-app-manifest-192x192.png',
+                sizes: '192x192',
+              },
+            ],
+          },
+          {
+            name: 'Add Expense',
+            short_name: 'Add Expense',
+            description: 'Quickly add expense',
+            url: '/expenses',
+            icons: [
+              {
+                src: '/favicon-data/web-app-manifest-192x192.png',
+                sizes: '192x192',
+              },
+            ],
           },
         ],
       },

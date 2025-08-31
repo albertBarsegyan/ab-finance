@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://abfinance.me/sitemap.xml
+
+# Disallow private areas
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /static/
+
+# Allow all other content
+Allow: /dashboard
+Allow: /income
+Allow: /expenses
+Allow: /goals
+Allow: /profile
+Allow: /login
+Allow: /register
+Allow: /questions
