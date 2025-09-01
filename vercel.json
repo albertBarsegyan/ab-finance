@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/((?!favicon-data/|assets/|api/).*)",
+      "source": "/((?!favicon-data/|assets/|api/|robots\\.txt|sitemap\\.xml).*)",
       "destination": "/"
     }
   ],

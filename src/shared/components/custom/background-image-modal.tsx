@@ -159,7 +159,7 @@ export function BackgroundImageModal({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Image className="h-5 w-5" />
