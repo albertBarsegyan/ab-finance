@@ -1,21 +1,48 @@
+# Robots.txt for https://abfinance.me
+# Generated on: 2024-12-19T00:00:00.000Z
+
+# Allow all search engines
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://abfinance.me/sitemap.xml
+# Explicitly allow public pages
+Allow: /login
+Allow: /register
 
-# Disallow private areas
+# Disallow private/authenticated areas
+Disallow: /dashboard
+Disallow: /income
+Disallow: /expenses
+Disallow: /goals
+Disallow: /profile
+Disallow: /questions
+
+# Disallow technical/system paths
 Disallow: /api/
 Disallow: /admin/
 Disallow: /_next/
 Disallow: /static/
+Disallow: /dev-dist/
+Disallow: /dist/
+Disallow: /node_modules/
+Disallow: /*.json$
+Disallow: /*.js$
+Disallow: /*.css$
+Disallow: /*.map$
 
-# Allow all other content
-Allow: /dashboard
-Allow: /income
-Allow: /expenses
-Allow: /goals
-Allow: /profile
-Allow: /login
-Allow: /register
-Allow: /questions
+# Disallow query parameters that don't add SEO value
+Disallow: /*?*
+Disallow: /*#*
+
+# Crawl delay (be respectful to server resources)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://abfinance.me/sitemap.xml
+
+# Additional sitemaps (if you have multiple)
+# Sitemap: https://abfinance.me/sitemap-images.xml
+# Sitemap: https://abfinance.me/sitemap-news.xml
+
+# Host directive (canonical domain)
+Host: https://abfinance.me
