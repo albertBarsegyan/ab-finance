@@ -15,7 +15,6 @@ Disallow: /income
 Disallow: /expenses
 Disallow: /goals
 Disallow: /profile
-Disallow: /questions
 
 # Disallow technical/system paths
 Disallow: /api/

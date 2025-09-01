@@ -10,6 +10,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        navigateFallbackDenylist: [/^\/robots\.txt$/, /^\/sitemap\.xml$/],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
+      },
       registerType: 'autoUpdate',
       includeAssets: [
         'favicon-data/favicon.ico',
