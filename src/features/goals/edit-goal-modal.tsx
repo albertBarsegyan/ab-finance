@@ -56,7 +56,7 @@ export function EditGoalModal({
     resolver: zodResolver(editGoalSchema),
     defaultValues: {
       goal: goalToEdit?.goal || '',
-      goalType: goalToEdit?.goalType || 'Emergency Fund',
+      goalType: goalToEdit?.goalType || goalTypes[0],
       goalPrice: goalToEdit?.goalPrice || '',
       goalCurrency: goalToEdit?.goalCurrency || 'USD',
       goalDuration: goalToEdit?.goalDuration || {
